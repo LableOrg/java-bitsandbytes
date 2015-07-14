@@ -1,0 +1,136 @@
+/**
+ * Copyright (C) 2015 Lable (info@lable.nl)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.lable.oss.bitsandbytes;
+
+/**
+ * Convert binary string representations to byte arrays and vice versa.
+ */
+public class Binary {
+
+    Binary() {
+        // Static utility class.
+    }
+
+    /**
+     * Convert a binary string representation of a byte array to that byte array. This method purposely ignores any
+     * characters that are not 1 or 0, so you can use spaces and any other punctuation deemed suitable to improve
+     * readability.
+     * <p/>
+     * The following input strings all return the same byte array:
+     * <ul>
+     * <li>"0000001000001111"</li>
+     * <li>"00000010_00001111"</li>
+     * <li>"[00000010] [00001111]"</li>
+     * <li>"10 00001111"</li>
+     * </ul>
+     *
+     * @param binary Input string.
+     * @return The corresponding byte array.
+     */
+    public static byte[] decode(String binary) {
+        if (binary == null) {
+            return new byte[]{};
+        }
+
+        StringBuilder cleanInput = new StringBuilder();
+        for (char c : binary.toCharArray()) {
+            // Strip out anything that isn't a 1 or 0.
+            if (c == '0' || c == '1') {
+                cleanInput.append(c);
+            }
+        }
+
+        char[] chars = cleanInput.toString().toCharArray();
+
+        int targetLength = chars.length / 8;
+        int remainder = chars.length % 8;
+        if (remainder != 0) {
+            targetLength += 1;
+        }
+
+        byte[] output = new byte[targetLength];
+        // If the input was not neatly divisible by 8, pad out the first byte with 0s by starting later in the loop.
+        int bitCounter = remainder == 0 ? 0 : 8 - remainder;
+        int byteCounter = 0;
+        for (char bit : chars) {
+            if (bit == '1') {
+                output[byteCounter] |= 1 << (7 - bitCounter);
+            }
+
+            bitCounter++;
+            if (bitCounter == 8) {
+                byteCounter++;
+                bitCounter = 0;
+            }
+        }
+        return output;
+    }
+
+    /**
+     * Encode a byte array as its binary string representation.
+     *
+     * @param input Input byte array.
+     * @return A string of ones and zeroes, or "NULL" if the input is null.
+     */
+    public static String encode(byte[] input) {
+        if (input == null) {
+            return "NULL";
+        }
+
+        StringBuilder output = new StringBuilder();
+        for (byte b : input) {
+            for (int i = 7; i > -1; i--) {
+                output.append((b >> i & 0x1) == 1 ? '1' : '0');
+            }
+        }
+
+        return output.toString();
+    }
+
+    /**
+     * Encode a byte array as its binary string representation.
+     *
+     * @param input             Input byte array.
+     * @param wrapBytesInBraces If true, every byte will be surrounded by braces.
+     * @param separateBytes     If true, every byte will be separated by a single space.
+     * @return A string of ones and zeroes, or "NULL" if the input is null.
+     */
+    public static String encode(byte[] input, boolean wrapBytesInBraces, boolean separateBytes) {
+        String binary = encode(input);
+
+        if (!(wrapBytesInBraces || separateBytes)) {
+            // Why even call this method if you don't want any pretty formatting?
+            return binary;
+        }
+
+        int byteCount = binary.length() / 8;
+        StringBuilder output = new StringBuilder();
+        for (int i = 0; i < byteCount; i++) {
+            if (i != 0 && separateBytes) {
+                output.append(' ');
+            }
+            if (wrapBytesInBraces) {
+                output.append('[');
+            }
+            output.append(binary.substring(byteCount * i, (byteCount * i) + 8));
+            if (wrapBytesInBraces) {
+                output.append(']');
+            }
+        }
+
+        return output.toString();
+    }
+}
