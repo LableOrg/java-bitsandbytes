@@ -278,7 +278,6 @@ public class ByteManglerTest {
         assertThat(result.getRight(), is(new byte[0]));
     }
 
-
     @Test
     public void oneHundredPercentCodeCoverageObsession() {
         // Because 99% code coverage is unbearable.
