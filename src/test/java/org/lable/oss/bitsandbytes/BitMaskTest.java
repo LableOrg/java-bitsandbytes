@@ -19,9 +19,12 @@ import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.lable.oss.bitsandbytes.BinaryMask.byteMask;
+import static org.lable.oss.bitsandbytes.BitMask.bitMask;
+import static org.lable.oss.bitsandbytes.BitMask.byteMask;
 
-public class BinaryMaskTest {
+public class BitMaskTest {
+    // BitMask#byteMask
+
     @Test
     public void byteMaskSimpleTest() {
         byte[] expected = new byte[]{0x0, 0x0, 0x1, 0x0, 0x1, 0x1};
@@ -41,11 +44,46 @@ public class BinaryMaskTest {
     @Test
     public void byteMaskNullTest() {
         assertThat(byteMask(null), is(new byte[0]));
+        assertThat(byteMask(), is(new byte[0]));
     }
+
+    // BitMask#bitMask
+
+    @Test
+    public void bitMaskSimpleTest() {
+        byte[] expected = Binary.decode("00001011");
+        byte[] result = bitMask(2, 1, 1, 2);
+
+        assertThat(Binary.encode(result), is(Binary.encode(expected)));
+    }
+
+    @Test
+    public void bitMaskSimpleTestStartWithOnes() {
+        byte[] expected = Binary.decode("11101111");
+        byte[] result = bitMask(0, 3, 1, 4);
+
+        assertThat(Binary.encode(result), is(Binary.encode(expected)));
+    }
+
+    @Test
+    public void bitMaskMultiByteTest() {
+        byte[] expected = Binary.decode("11000000 11101111");
+        byte[] result = bitMask(0, 2, 6, 3, 1, 4);
+
+        assertThat(Binary.encode(result), is(Binary.encode(expected)));
+    }
+
+    @Test
+    public void bitMaskNullTest() {
+        assertThat(bitMask(null), is(new byte[0]));
+        assertThat(bitMask(), is(new byte[0]));
+    }
+
+    // For code coverage.
 
     @Test
     public void oneHundredPercentCodeCoverageObsession() {
         // Because 99% code coverage is unbearable.
-        new BinaryMask();
+        new BitMask();
     }
 }
