@@ -17,6 +17,8 @@ package org.lable.oss.bitsandbytes;
 
 import org.junit.Test;
 
+import java.util.List;
+
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -98,7 +100,6 @@ public class ByteManglerTest {
     public void flipTestEmpty() {
         assertThat(flip(new byte[]{}), is(new byte[]{}));
     }
-
 
 
     @Test
@@ -214,22 +215,23 @@ public class ByteManglerTest {
 
     @Test
     public void splitEmptyTest() {
-        SplitResult result = split(new byte[]{}, new byte[]{});
-        assertThat(result.getLeft(), is(new byte[]{}));
-        assertThat(result.getRight(), is(new byte[]{}));
+        List<byte[]> result = split(new byte[]{}, new byte[]{});
+
+        assertThat(result.size(), is(1));
+        assertThat(result.get(0), is(new byte[]{}));
     }
 
     @Test
     public void splitNullDelimiterTest() {
         final byte[] input = new byte[]{0x01, 0x00};
 
-        SplitResult result = split(null, input);
-        assertThat(result.getLeft(), is(input));
-        assertThat(result.getRight(), is(new byte[0]));
+        List<byte[]> result = split(input, null);
+        assertThat(result.size(), is(1));
+        assertThat(result.get(0), is(input));
 
-        result = split(new byte[0], input);
-        assertThat(result.getLeft(), is(input));
-        assertThat(result.getRight(), is(new byte[0]));
+        result = split(input, new byte[0]);
+        assertThat(result.size(), is(1));
+        assertThat(result.get(0), is(input));
     }
 
     @Test
@@ -237,9 +239,23 @@ public class ByteManglerTest {
         final byte[] input = new byte[]{0x01, 0x00};
         final byte[] delimiter = new byte[]{0x02, 0x02, 0x02};
 
-        SplitResult result = split(delimiter, input);
-        assertThat(result.getLeft(), is(input));
-        assertThat(result.getRight(), is(new byte[0]));
+        List<byte[]> result = split(input, delimiter);
+        assertThat(result.size(), is(1));
+        assertThat(result.get(0), is(input));
+    }
+
+    @Test
+    public void splitLimitOfOneTest() {
+        final byte[] input = new byte[]{0x01, 0x00};
+        final byte[] delimiter = new byte[]{0x02, 0x02, 0x02};
+
+        List<byte[]> result = split(input, delimiter, 1);
+        assertThat(result.size(), is(1));
+        assertThat(result.get(0), is(input));
+
+        result = split(input, delimiter, -1);
+        assertThat(result.size(), is(1));
+        assertThat(result.get(0), is(input));
     }
 
     @Test
@@ -253,9 +269,11 @@ public class ByteManglerTest {
         final byte[] input = new byte[]{0x01, 0x02, 0x03, 0x04, 0x05, 0x06};
         final byte[] delimiter = new byte[]{0x03, 0x04};
 
-        SplitResult result = split(delimiter, input);
-        assertThat(result.getLeft(), is(new byte[]{0x01, 0x02}));
-        assertThat(result.getRight(), is(new byte[]{0x05, 0x06}));
+        List<byte[]> result = split(input, delimiter);
+
+        assertThat(result.size(), is(2));
+        assertThat(result.get(0), is(new byte[]{0x01, 0x02}));
+        assertThat(result.get(1), is(new byte[]{0x05, 0x06}));
     }
 
     @Test
@@ -263,9 +281,12 @@ public class ByteManglerTest {
         final byte[] input = new byte[]{0x01, 0x00, 0x02, 0x03, 0x04, 0x05, 0x06, 0x00, 0x07};
         final byte[] delimiter = new byte[]{0x00};
 
-        SplitResult result = split(delimiter, input);
-        assertThat(result.getLeft(), is(new byte[]{0x01}));
-        assertThat(result.getRight(), is(new byte[]{0x02, 0x03, 0x04, 0x05, 0x06, 0x00, 0x07}));
+        List<byte[]> result = split(input, delimiter, 10);
+
+        assertThat(result.size(), is(3));
+        assertThat(result.get(0), is(new byte[]{0x01}));
+        assertThat(result.get(1), is(new byte[]{0x02, 0x03, 0x04, 0x05, 0x06}));
+        assertThat(result.get(2), is(new byte[]{0x07}));
     }
 
     @Test
@@ -273,10 +294,155 @@ public class ByteManglerTest {
         final byte[] input = new byte[]{0x01, 0x00, 0x02, 0x03, 0x04, 0x05, 0x06, 0x00, 0x07};
         final byte[] delimiter = new byte[]{0x08};
 
-        SplitResult result = split(delimiter, input);
-        assertThat(result.getLeft(), is(input));
-        assertThat(result.getRight(), is(new byte[0]));
+        List<byte[]> result = split(input, delimiter);
+
+        assertThat(result.size(), is(1));
+        assertThat(result.get(0), is(input));
     }
+
+    @Test
+    public void splitLimitTest() {
+        final byte[] input = new byte[]{0x01, 0x00, 0x02, 0x03, 0x04, 0x05, 0x06, 0x00, 0x07};
+        final byte[] delimiter = new byte[]{0x00};
+
+        List<byte[]> result = split(input, delimiter, 2);
+
+        assertThat(result.size(), is(2));
+        assertThat(result.get(0), is(new byte[]{0x01}));
+        assertThat(result.get(1), is(new byte[]{0x02, 0x03, 0x04, 0x05, 0x06, 0x00, 0x07}));
+    }
+
+    @Test
+    public void splitReverseLimitTest() {
+        final byte[] input = new byte[]{0x01, 0x00, 0x02, 0x03, 0x04, 0x05, 0x06, 0x00, 0x07};
+        final byte[] delimiter = new byte[]{0x00};
+
+        List<byte[]> result = split(input, delimiter, -2);
+
+        assertThat(result.size(), is(2));
+        assertThat(result.get(0), is(new byte[]{0x01, 0x00, 0x02, 0x03, 0x04, 0x05, 0x06}));
+        assertThat(result.get(1), is(new byte[]{0x07}));
+    }
+
+    @Test
+    public void splitReverseLimitLongerTest() {
+        final byte[] input = new byte[]{0x01, 0x00, 0x02, 0x00, 0x03, 0x00, 0x04, 0x00 ,0x05, 0x00, 0x06};
+        final byte[] delimiter = new byte[]{0x00};
+
+        List<byte[]> result = split(input, delimiter, -3);
+
+        assertThat(result.size(), is(3));
+        assertThat(result.get(0), is(new byte[]{0x01, 0x00, 0x02, 0x00, 0x03, 0x00, 0x04}));
+        assertThat(result.get(1), is(new byte[]{0x05}));
+        assertThat(result.get(2), is(new byte[]{0x06}));
+    }
+
+    @Test
+    public void splitReverseLimitLongerDelimiterTest() {
+        final byte[] input = new byte[]{0x01, 0x00, 0x00, 0x02, 0x03, 0x04, 0x05, 0x06, 0x00, 0x00, 0x07};
+        final byte[] delimiter = new byte[]{0x00, 0x00};
+
+        List<byte[]> result = split(input, delimiter, -2);
+
+        assertThat(result.size(), is(2));
+        assertThat(result.get(0), is(new byte[]{0x01, 0x00, 0x00, 0x02, 0x03, 0x04, 0x05, 0x06}));
+        assertThat(result.get(1), is(new byte[]{0x07}));
+    }
+
+    @Test
+    public void splitDelimiterSurroundedTest() {
+        final byte[] input = new byte[]{0x3A, 0x00, 0x3A, 0x01, 0x02, 0x03, 0x3A, 0x04, 0x3A};
+        final byte[] delimiter = new byte[]{0x3A};
+
+        List<byte[]> result = split(input, delimiter);
+
+        assertThat(result.size(), is(5));
+        assertThat(result.get(0), is(new byte[]{}));
+        assertThat(result.get(1), is(new byte[]{0x00}));
+        assertThat(result.get(2), is(new byte[]{0x01, 0x02, 0x03}));
+        assertThat(result.get(3), is(new byte[]{0x04}));
+        assertThat(result.get(4), is(new byte[]{}));
+    }
+
+    @Test
+    public void splitAllDelimiterSimpleTest() {
+        final byte[] input = new byte[]{0x7F};
+        final byte[] delimiter = new byte[]{0x7F};
+
+        List<byte[]> result = split(input, delimiter);
+
+        assertThat(result.size(), is(2));
+        assertThat(result.get(0), is(new byte[]{}));
+        assertThat(result.get(1), is(new byte[]{}));
+    }
+
+    @Test
+    public void splitAllDelimiterReverseSimpleTest() {
+        final byte[] input = new byte[]{0x7F};
+        final byte[] delimiter = new byte[]{0x7F};
+
+        List<byte[]> result = split(input, delimiter, -10);
+
+        assertThat(result.size(), is(2));
+        assertThat(result.get(0), is(new byte[]{}));
+        assertThat(result.get(1), is(new byte[]{}));
+    }
+
+    @Test
+    public void splitAllDelimiterMoreTest() {
+        final byte[] input = new byte[]{0x5B, 0x5B, 0x5B, 0x5B};
+        final byte[] delimiter = new byte[]{0x5B};
+
+        List<byte[]> result = split(input, delimiter);
+
+        assertThat(result.size(), is(5));
+        assertThat(result.get(0), is(new byte[]{}));
+        assertThat(result.get(1), is(new byte[]{}));
+        assertThat(result.get(2), is(new byte[]{}));
+        assertThat(result.get(3), is(new byte[]{}));
+        assertThat(result.get(4), is(new byte[]{}));
+    }
+
+    @Test
+    public void splitAllDelimiterLongerTest() {
+        final byte[] input = new byte[]{0x22, 0x22, 0x22, 0x22};
+        final byte[] delimiter = new byte[]{0x22, 0x22};
+
+        List<byte[]> result = split(input, delimiter);
+
+        assertThat(result.size(), is(3));
+        assertThat(result.get(0), is(new byte[]{}));
+        assertThat(result.get(1), is(new byte[]{}));
+        assertThat(result.get(2), is(new byte[]{}));
+    }
+
+    @Test
+    public void splitAllDelimiterRemainingTest() {
+        final byte[] input = new byte[]{0x1A, 0x1A, 0x1A, 0x1A, 0x1A};
+        final byte[] delimiter = new byte[]{0x1A, 0x1A};
+
+        List<byte[]> result = split(input, delimiter);
+
+        assertThat(result.size(), is(3));
+        assertThat(result.get(0), is(new byte[]{}));
+        assertThat(result.get(1), is(new byte[]{}));
+        assertThat(result.get(2), is(new byte[]{0x1A}));
+    }
+
+    @Test
+    public void splitStringsTest() {
+        final byte[] input = "test string with spaces.".getBytes();
+        final byte[] delimiter = " ".getBytes();
+
+        List<byte[]> result = split(input, delimiter);
+
+        assertThat(result.size(), is(4));
+        assertThat(result.get(0), is("test".getBytes()));
+        assertThat(result.get(1), is("string".getBytes()));
+        assertThat(result.get(2), is("with".getBytes()));
+        assertThat(result.get(3), is("spaces.".getBytes()));
+    }
+
 
     @Test
     public void oneHundredPercentCodeCoverageObsession() {

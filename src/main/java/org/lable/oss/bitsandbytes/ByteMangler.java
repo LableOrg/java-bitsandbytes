@@ -15,6 +15,11 @@
  */
 package org.lable.oss.bitsandbytes;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Byte and bitwise operations.
  */
@@ -176,32 +181,87 @@ public class ByteMangler {
     }
 
     /**
-     * Split a byte array into two parts, at the first occurrence of the delimiter. The resulting two parts do not
-     * contain the delimiter at which the split took place.
-     * <p/>
-     * If the delimiter is not encountered, the left-hand side of the return value will be the input array.
+     * Split a byte array into parts, splitting at each occurrence of the delimiter. The returned parts do not contain
+     * the delimiter itself.
      *
+     * @param input     Input.
      * @param delimiter Delimiter to split on.
-     * @param rawKey    Input.
      * @return The result of the splitting operation.
+     * @see #split(byte[], byte[], int)
      */
-    public static SplitResult split(byte[] delimiter, byte[] rawKey) {
-        if (rawKey == null) {
-            return null;
-        }
-        if (delimiter == null || delimiter.length == 0 || delimiter.length > rawKey.length) {
-            // Without a delimiter the whole of the input byte array is left of the (nonexistent) delimiter.
-            return new SplitResult(rawKey, new byte[]{});
+    public static List<byte[]> split(byte[] input, byte[] delimiter) {
+        return split(input, delimiter, 0);
+    }
+
+    /**
+     * Split a byte array into parts, splitting at each occurrence of the delimiter. The returned parts do not contain
+     * the delimiter itself.
+     *
+     * @param input     Input.
+     * @param delimiter Delimiter to split on.
+     * @param limit     Limit the number of parts returned to this amount. A limit of 0 implies no limit. A negative
+     *                  limit will cause this method to start splitting from the back and limit the number of parts to
+     *                  the absolute value of limit.
+     * @return The result of the splitting operation.
+     * @see #split(byte[], byte[])
+     */
+    public static List<byte[]> split(byte[] input, byte[] delimiter, int limit) {
+        if (input == null) return null;
+        // No point in splitting if at most one part should be returned.
+        if (limit == 1 || limit == -1) return Collections.singletonList(input);
+
+        if (delimiter == null || delimiter.length == 0 || delimiter.length > input.length) {
+            // Without a delimiter the whole of the input byte array is returned, because there is nothing to split.
+            return Collections.singletonList(input);
         }
 
-        // Don't loop over every byte in the array, but stop at the last possible starting byte of the delimiter.
-        for (int i = 0; i < rawKey.length - (delimiter.length - 1); i++) {
-            if (matchesDelimiter(delimiter, rawKey, i)) {
-                return new SplitResult(shrink(i, rawKey), chomp(i + delimiter.length, rawKey));
+        List<byte[]> parts = new ArrayList<>();
+        if (limit >= 0) {
+            int rangeStart = 0;
+            int i = 0;
+            // Don't loop over every byte in the array, but stop at the last possible starting byte of the delimiter.
+            while (i < input.length - (delimiter.length - 1)) {
+                if (matchesDelimiter(delimiter, input, i)) {
+                    parts.add(Arrays.copyOfRange(input, rangeStart, i));
+                    rangeStart = i + delimiter.length;
+
+                    // Stop one part before the limit, because the last part is whatever remains.
+                    if (limit > 0 && parts.size() >= limit - 1) break;
+
+                    i += delimiter.length;
+                } else {
+                    i++;
+                }
             }
+
+            // Add whatever remains as the last part.
+            parts.add(chomp(rangeStart, input));
+        } else {
+            // Reverse split.
+
+            limit = -limit;
+            int rangeEnd = input.length;
+            // Don't loop over every byte in the array, but start at the first possible starting byte of the delimiter.
+            int i = input.length - delimiter.length;
+            while (i >= 0) {
+                if (matchesDelimiter(delimiter, input, i)) {
+                    parts.add(0, Arrays.copyOfRange(input, i + delimiter.length, rangeEnd));
+                    rangeEnd = i;
+
+                    // Stop one part before the limit, because the last part is whatever remains.
+                    if (parts.size() >= limit - 1) break;
+
+                    i -= delimiter.length;
+                } else {
+                    i--;
+                }
+            }
+
+            // Add whatever remains as the first part.
+            parts.add(0, shrink(rangeEnd, input));
         }
 
-        return new SplitResult(rawKey, new byte[]{});
+        return parts;
     }
 
     // Private helper method.
@@ -216,32 +276,5 @@ public class ByteMangler {
             }
         }
         return false;
-    }
-
-    /**
-     * Result of a byte array splitting operation. A tuple, essentially.
-     */
-    public static class SplitResult {
-        private final byte[] left;
-        private final byte[] right;
-
-        SplitResult(byte[] left, byte[] right) {
-            this.left = left;
-            this.right = right;
-        }
-
-        /**
-         * @return Left part of the split.
-         */
-        public byte[] getLeft() {
-            return left;
-        }
-
-        /**
-         * @return Right part of the split.
-         */
-        public byte[] getRight() {
-            return right;
-        }
     }
 }
