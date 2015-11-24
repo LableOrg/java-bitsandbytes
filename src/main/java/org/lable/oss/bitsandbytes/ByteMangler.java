@@ -181,6 +181,33 @@ public class ByteMangler {
     }
 
     /**
+     * Combine an arbitrary number of byte arrays into a single byte array.
+     *
+     * @param input Byte arrays to concatenate. Nulls are treated as empty byte arrays.
+     * @return A single concatenated byte array.
+     */
+    public static byte[] add(byte[]... input) {
+        if (input == null) return new byte[0];
+
+        int length = 0;
+        for (byte[] bytes : input) {
+            if (bytes == null) continue;
+            length += bytes.length;
+        }
+
+        byte [] result = new byte[length];
+
+        int pos = 0;
+        for (byte[] bytes : input) {
+            if (bytes == null) continue;
+            System.arraycopy(bytes, 0, result, pos, bytes.length);
+            pos += bytes.length;
+        }
+
+        return result;
+    }
+
+    /**
      * Split a byte array into parts, splitting at each occurrence of the delimiter. The returned parts do not contain
      * the delimiter itself.
      *

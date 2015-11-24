@@ -209,6 +209,32 @@ public class ByteManglerTest {
 
 
     @Test
+    public void addNullTest() {
+        // Not very strange.
+        assertThat(add((byte[]) null), is(new byte[0]));
+        // Why would anyone do this?
+        assertThat(add((byte[][]) null), is(new byte[0]));
+    }
+
+    @Test
+    public void addNothingTest() {
+        assertThat(add(), is(new byte[0]));
+    }
+
+    @Test
+    public void addNullArgumentTest() {
+        assertThat(add("XXX".getBytes(), null, "YYY".getBytes()), is("XXXYYY".getBytes()));
+    }
+
+    @Test
+    public void addTest() {
+        assertThat(
+                add("XXX".getBytes(), "YYY".getBytes(), "ZZZ".getBytes(), "əəə".getBytes()),
+                is("XXXYYYZZZəəə".getBytes()));
+    }
+
+
+    @Test
     public void splitNullTest() {
         assertThat(split(null, null), is(nullValue()));
     }
