@@ -87,7 +87,7 @@ public class BinaryTest {
 
     @Test
     public void oneHundredPercentCodeCoverageObsession() {
-        // Because 99% code coverage is unbearable.
-        new Binary();
+        // Because 99% code coverage is vexing.
+        new ByteConversion();
     }
 }

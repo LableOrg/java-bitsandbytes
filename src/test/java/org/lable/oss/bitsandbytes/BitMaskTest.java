@@ -83,7 +83,7 @@ public class BitMaskTest {
 
     @Test
     public void oneHundredPercentCodeCoverageObsession() {
-        // Because 99% code coverage is unbearable.
+        // Because 99% code coverage is irksome.
         new BitMask();
     }
 }
