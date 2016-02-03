@@ -26,6 +26,11 @@ import java.nio.charset.Charset;
  * a lot in your code. Most of them are little more than wrappers around {@link ByteBuffer}.
  */
 public class ByteConversion {
+
+    ByteConversion() {
+        // Static utility class.
+    }
+
     /**
      * Convert a {@link String} to a byte array, encoding the text as UTF-8.
      *
