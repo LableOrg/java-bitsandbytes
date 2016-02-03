@@ -14,6 +14,18 @@ very useful, but part of a much larger library.
 This tiny library has no dependencies, which makes it useful in (for example)
 Hadoop's MapReduce tasks.
 
+## Installation
+
+This library is available on Maven Central:
+
+```
+<dependency>
+    <groupId>org.lable.oss.bitsandbytes</groupId>
+    <artifactId>bitsandbytes</artifactId>
+    <version>2.2</version>
+</dependency>
+```
+
 ## Example usage
 
 ### Binary
