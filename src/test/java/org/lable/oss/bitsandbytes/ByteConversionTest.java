@@ -27,6 +27,8 @@ import static javax.xml.bind.DatatypeConverter.parseHexBinary;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.lable.oss.bitsandbytes.ByteConversion.NumberRepresentation.LEXICOGRAPHIC_SORT;
+import static org.lable.oss.bitsandbytes.ByteConversion.NumberRepresentation.TWOS_COMPLEMENT;
 import static org.lable.oss.bitsandbytes.ByteConversion.*;
 
 public class ByteConversionTest {
@@ -58,9 +60,17 @@ public class ByteConversionTest {
     @Test
     public void fromIntTest() throws ConversionException {
         assertThat(fromInt(0), is(parseHexBinary("00000000")));
+
         assertThat(fromInt(Integer.MAX_VALUE), is(parseHexBinary("7fffffff")));
+        assertThat(fromInt(Integer.MAX_VALUE, TWOS_COMPLEMENT), is(parseHexBinary("7fffffff")));
+        assertThat(fromInt(Integer.MAX_VALUE, LEXICOGRAPHIC_SORT), is(parseHexBinary("ffffffff")));
+
         assertThat(fromInt(Integer.MIN_VALUE), is(parseHexBinary("80000000")));
-        assertThat(fromInt(new Integer(256)), is(parseHexBinary("00000100")));
+        assertThat(fromInt(Integer.MIN_VALUE, TWOS_COMPLEMENT), is(parseHexBinary("80000000")));
+        assertThat(fromInt(Integer.MIN_VALUE, LEXICOGRAPHIC_SORT), is(parseHexBinary("00000000")));
+
+        assertThat(fromInt(new Integer(256), TWOS_COMPLEMENT), is(parseHexBinary("00000100")));
+        assertThat(fromInt(new Integer(256), LEXICOGRAPHIC_SORT), is(parseHexBinary("80000100")));
     }
 
     @Test(expected = ConversionException.class)
@@ -71,7 +81,12 @@ public class ByteConversionTest {
     @Test
     public void toIntTest() throws ConversionException {
         assertThat(toInt(parseHexBinary("80000000")), is(Integer.MIN_VALUE));
+        assertThat(toInt(parseHexBinary("80000000"), TWOS_COMPLEMENT), is(Integer.MIN_VALUE));
+        assertThat(toInt(parseHexBinary("00000000"), LEXICOGRAPHIC_SORT), is(Integer.MIN_VALUE));
+
         assertThat(toInt(parseHexBinary("7fffffff")), is(Integer.MAX_VALUE));
+        assertThat(toInt(parseHexBinary("7fffffff"), TWOS_COMPLEMENT), is(Integer.MAX_VALUE));
+        assertThat(toInt(parseHexBinary("ffffffff"), LEXICOGRAPHIC_SORT), is(Integer.MAX_VALUE));
     }
 
     @Test(expected = ConversionException.class)
@@ -138,8 +153,16 @@ public class ByteConversionTest {
     public void fromLongTest() throws ConversionException {
         assertThat(fromLong(0L), is(parseHexBinary("0000000000000000")));
         assertThat(fromLong(new Long(1L)), is(parseHexBinary("0000000000000001")));
+        assertThat(fromLong(new Long(1L), TWOS_COMPLEMENT), is(parseHexBinary("0000000000000001")));
+        assertThat(fromLong(new Long(1L), LEXICOGRAPHIC_SORT), is(parseHexBinary("8000000000000001")));
+
         assertThat(fromLong(Long.MIN_VALUE), is(parseHexBinary("8000000000000000")));
+        assertThat(fromLong(Long.MIN_VALUE, TWOS_COMPLEMENT), is(parseHexBinary("8000000000000000")));
+        assertThat(fromLong(Long.MIN_VALUE, LEXICOGRAPHIC_SORT), is(parseHexBinary("0000000000000000")));
+
         assertThat(fromLong(Long.MAX_VALUE), is(parseHexBinary("7fffffffffffffff")));
+        assertThat(fromLong(Long.MAX_VALUE, TWOS_COMPLEMENT), is(parseHexBinary("7fffffffffffffff")));
+        assertThat(fromLong(Long.MAX_VALUE, LEXICOGRAPHIC_SORT), is(parseHexBinary("ffffffffffffffff")));
     }
 
     @Test(expected = ConversionException.class)
@@ -156,8 +179,14 @@ public class ByteConversionTest {
     public void toLongTest() throws ConversionException {
         assertThat(toLong(parseHexBinary("0000000000000000")), is(0L));
         assertThat(toLong(parseHexBinary("0000000000000001")), is(1L));
+
         assertThat(toLong(parseHexBinary("8000000000000000")), is(Long.MIN_VALUE));
+        assertThat(toLong(parseHexBinary("8000000000000000"), TWOS_COMPLEMENT), is(Long.MIN_VALUE));
+        assertThat(toLong(parseHexBinary("0000000000000000"), LEXICOGRAPHIC_SORT), is(Long.MIN_VALUE));
+
         assertThat(toLong(parseHexBinary("7fffffffffffffff")), is(Long.MAX_VALUE));
+        assertThat(toLong(parseHexBinary("7fffffffffffffff"), TWOS_COMPLEMENT), is(Long.MAX_VALUE));
+        assertThat(toLong(parseHexBinary("ffffffffffffffff"), LEXICOGRAPHIC_SORT), is(Long.MAX_VALUE));
     }
 
 
@@ -204,9 +233,15 @@ public class ByteConversionTest {
     @Test
     public void toBigDecimalTest() throws ConversionException {
         assertThat(toBigDecimal(parseHexBinary("0000000000")), is(BigDecimal.ZERO));
-        assertThat(
-                toBigDecimal(parseHexBinary("ffffff9c00")).toString(),
-                is("0E+100"));
+        assertThat(toBigDecimal(parseHexBinary("ffffff9c00")).toString(), is("0E+100"));
+    }
+
+
+    @Test
+    public void numberRepresentationTest() {
+        assertThat(NumberRepresentation.values().length, is(2));
+        assertThat(NumberRepresentation.valueOf("TWOS_COMPLEMENT"), is(TWOS_COMPLEMENT));
+        assertThat(NumberRepresentation.valueOf("LEXICOGRAPHIC_SORT"), is(LEXICOGRAPHIC_SORT));
     }
 
     @Test

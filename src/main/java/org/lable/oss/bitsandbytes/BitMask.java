@@ -15,6 +15,10 @@
  */
 package org.lable.oss.bitsandbytes;
 
+/**
+ * Create bit or byte masks, where respectively each bit or the bytes 0x0 and 0x1 represent the mask, from a pattern
+ * specification.
+ */
 public class BitMask {
 
     BitMask() {

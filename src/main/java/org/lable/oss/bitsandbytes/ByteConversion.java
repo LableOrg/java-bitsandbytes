@@ -21,9 +21,13 @@ import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
+import static org.lable.oss.bitsandbytes.ByteMangler.flipTheFirstBit;
+
 /**
  * Convert Java primitives to and from byte arrays for storage. These methods are useful when such operations happen
  * a lot in your code. Most of them are little more than wrappers around {@link ByteBuffer}.
+ * <p>
+ * For all operations the Big-Endian byte order is maintained. For strings the desired encoding is assumed to be UTF-8.
  */
 public class ByteConversion {
 
@@ -67,6 +71,34 @@ public class ByteConversion {
     }
 
     /**
+     * Convert an {@link Integer} to bytes, according to the specified {@link NumberRepresentation}.
+     *
+     * @param input                Input value.
+     * @param numberRepresentation How to represent the number in bytes.
+     * @return Bytes.
+     * @throws ConversionException Thrown when the input is null.
+     */
+    public static byte[] fromInt(Integer input, NumberRepresentation numberRepresentation) throws ConversionException {
+        return numberRepresentation == NumberRepresentation.LEXICOGRAPHIC_SORT
+                ? flipTheFirstBit(fromInt(input))
+                : fromInt(input);
+    }
+
+    /**
+     * Convert an int primitive to bytes, according to the specified {@link NumberRepresentation}.
+     *
+     * @param input                Input value.
+     * @param numberRepresentation How to represent the number in bytes.
+     * @return Bytes.
+     * @throws ConversionException Thrown when the input is null.
+     */
+    public static byte[] fromInt(int input, NumberRepresentation numberRepresentation) throws ConversionException {
+        return numberRepresentation == NumberRepresentation.LEXICOGRAPHIC_SORT
+                ? flipTheFirstBit(fromInt(input))
+                : fromInt(input);
+    }
+
+    /**
      * Convert an int primitive to bytes.
      *
      * @param input Input value.
@@ -86,6 +118,19 @@ public class ByteConversion {
         assertNotNull(bytes);
         assertNumBytes(bytes, 4);
         return ByteBuffer.allocate(4).put(bytes).getInt(0);
+    }
+
+    /**
+     * Convert a byte array to an int, according to the specified {@link NumberRepresentation}.
+     *
+     * @param bytes                Byte array.
+     * @param numberRepresentation How the bytes represent the number.
+     * @return An int.
+     */
+    public static int toInt(byte[] bytes, NumberRepresentation numberRepresentation) throws ConversionException {
+        return numberRepresentation == NumberRepresentation.LEXICOGRAPHIC_SORT
+                ? toInt(flipTheFirstBit(bytes))
+                : toInt(bytes);
     }
 
 
@@ -172,6 +217,34 @@ public class ByteConversion {
     }
 
     /**
+     * Convert a {@link Long} to bytes, according to the specified {@link NumberRepresentation}.
+     *
+     * @param input                Input value.
+     * @param numberRepresentation How to represent the number in bytes.
+     * @return Bytes.
+     * @throws ConversionException Thrown when the input is null.
+     */
+    public static byte[] fromLong(Long input, NumberRepresentation numberRepresentation) throws ConversionException {
+        return numberRepresentation == NumberRepresentation.LEXICOGRAPHIC_SORT
+                ? flipTheFirstBit(fromLong(input))
+                : fromLong(input);
+    }
+
+    /**
+     * Convert a long primitive to bytes, according to the specified {@link NumberRepresentation}.
+     *
+     * @param input                Input value.
+     * @param numberRepresentation How to represent the number in bytes.
+     * @return Bytes.
+     * @throws ConversionException Thrown when the input is null.
+     */
+    public static byte[] fromLong(long input, NumberRepresentation numberRepresentation) throws ConversionException {
+        return numberRepresentation == NumberRepresentation.LEXICOGRAPHIC_SORT
+                ? flipTheFirstBit(fromLong(input))
+                : fromLong(input);
+    }
+
+    /**
      * Convert a long primitive to bytes.
      *
      * @param input Input value.
@@ -187,10 +260,23 @@ public class ByteConversion {
      * @param bytes Byte array.
      * @return A long.
      */
-    public static Long toLong(byte[] bytes) throws ConversionException {
+    public static long toLong(byte[] bytes) throws ConversionException {
         assertNotNull(bytes);
         assertNumBytes(bytes, 8);
         return ByteBuffer.allocate(8).put(bytes).getLong(0);
+    }
+
+    /**
+     * Convert a byte array to a long, according to the specified {@link NumberRepresentation}.
+     *
+     * @param bytes                Byte array.
+     * @param numberRepresentation How the bytes represent the number.
+     * @return A long.
+     */
+    public static long toLong(byte[] bytes, NumberRepresentation numberRepresentation) throws ConversionException {
+        return numberRepresentation == NumberRepresentation.LEXICOGRAPHIC_SORT
+                ? toLong(flipTheFirstBit(bytes))
+                : toLong(bytes);
     }
 
 
@@ -278,5 +364,19 @@ public class ByteConversion {
         public ConversionException(String message) {
             super(message);
         }
+    }
+
+    /**
+     * Specify how numbers are converted to and from bytes.
+     */
+    public enum NumberRepresentation {
+        /**
+         * Java's default; two's complement.
+         */
+        TWOS_COMPLEMENT,
+        /**
+         * The byte representation of both negative and positive numbers sorts naturally.
+         */
+        LEXICOGRAPHIC_SORT
     }
 }
