@@ -25,24 +25,24 @@ public class BytePrinter {
             new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
     // UTF-8.
-    static final byte SINGLE_BYTE_CHAR_MASK = Binary.decode("10000000")[0];
+    static final byte SINGLE_BYTE_CHAR_MASK = -128; // 10000000.
     static final byte SINGLE_BYTE_CHAR_LEADER = 0b00000000;
 
-    static final byte DOUBLE_BYTE_CHAR_MASK = Binary.decode("11100000")[0];
+    static final byte DOUBLE_BYTE_CHAR_MASK = -32; // 11100000.
     static final byte DOUBLE_BYTE_VALUE_CHAR_MASK = 0b00011111;
-    static final byte DOUBLE_BYTE_CHAR_LEADER = Binary.decode("11000000")[0];
+    static final byte DOUBLE_BYTE_CHAR_LEADER = -64; // 11000000.
 
-    static final byte TRIPLE_BYTE_CHAR_MASK = Binary.decode("11110000")[0];
+    static final byte TRIPLE_BYTE_CHAR_MASK = -16; // 11110000.
     static final byte TRIPLE_BYTE_VALUE_CHAR_MASK = 0b00001111;
-    static final byte TRIPLE_BYTE_CHAR_LEADER = Binary.decode("11100000")[0];
+    static final byte TRIPLE_BYTE_CHAR_LEADER = -32; //11100000.
 
-    static final byte QUADRUPLE_BYTE_CHAR_MASK = Binary.decode("11111000")[0];
+    static final byte QUADRUPLE_BYTE_CHAR_MASK = -8; // 11111000.
     static final byte QUADRUPLE_BYTE_VALUE_CHAR_MASK = 0b00000111;
-    static final byte QUADRUPLE_BYTE_CHAR_LEADER = Binary.decode("11110000")[0];
+    static final byte QUADRUPLE_BYTE_CHAR_LEADER = -16; // 11110000.
 
-    static final byte CONTINUATION_BYTE_CHAR_MASK = Binary.decode("11000000")[0];
+    static final byte CONTINUATION_BYTE_CHAR_MASK = -64; // 11000000.
     static final byte CONTINUATION_BYTE_VALUE_CHAR_MASK = 0b00111111;
-    static final byte CONTINUATION_BYTE_CHAR_LEADER = Binary.decode("10000000")[0];
+    static final byte CONTINUATION_BYTE_CHAR_LEADER = -128; // 10000000.
 
     BytePrinter() {
         // Static utility class.
