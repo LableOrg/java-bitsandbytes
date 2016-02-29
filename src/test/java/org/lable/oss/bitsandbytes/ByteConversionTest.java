@@ -22,6 +22,7 @@ import org.lable.oss.bitsandbytes.ByteConversion.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.time.*;
 
 import static javax.xml.bind.DatatypeConverter.parseHexBinary;
 import static org.hamcrest.core.Is.is;
@@ -234,6 +235,95 @@ public class ByteConversionTest {
     public void toBigDecimalTest() throws ConversionException {
         assertThat(toBigDecimal(parseHexBinary("0000000000")), is(BigDecimal.ZERO));
         assertThat(toBigDecimal(parseHexBinary("ffffff9c00")).toString(), is("0E+100"));
+    }
+
+
+    @Test
+    public void fromInstantTest() throws ConversionException {
+        assertThat(fromInstant(Instant.EPOCH), is(parseHexBinary("000000000000000000000000")));
+
+        // No nano part.
+        assertThat(fromInstant(Instant.ofEpochMilli(1456759960000L)), is(parseHexBinary("0000000056d4649800000000")));
+
+        // No seconds, only nano.
+        assertThat(fromInstant(Instant.ofEpochSecond(0L, 16)), is(parseHexBinary("000000000000000000000010")));
+    }
+
+    @Test
+    public void toInstantTest() throws ConversionException {
+        assertThat(toInstant(parseHexBinary("000000000000000000000000")), is(Instant.EPOCH));
+
+        // No nano part.
+        assertThat(toInstant(parseHexBinary("0000000056d4649800000000")), is(Instant.ofEpochMilli(1456759960000L)));
+
+        // No seconds, only nano.
+        assertThat(toInstant(parseHexBinary("000000000000000000000010")), is(Instant.ofEpochSecond(0L, 16)));
+    }
+
+
+    @Test
+    public void fromOffsetDateTimeTest() throws ConversionException {
+        OffsetDateTime odt = OffsetDateTime.ofInstant(Instant.EPOCH, ZoneOffset.of("Z"));
+
+        // All zeroes for the instant and 'Z' in UTF-8.
+        assertThat(fromOffsetDateTime(odt), is(parseHexBinary("0000000000000000000000005a")));
+
+        odt = OffsetDateTime.ofInstant(Instant.EPOCH, ZoneOffset.of("+03:00"));
+        assertThat(fromOffsetDateTime(odt), is(parseHexBinary("0000000000000000000000002b30333a3030")));
+
+        odt = OffsetDateTime.of(LocalDate.of(1999, Month.AUGUST, 3), LocalTime.NOON, ZoneOffset.of("-04:00"));
+        assertThat(fromOffsetDateTime(odt), is(parseHexBinary("0000000037a71200000000002d30343a3030")));
+    }
+
+    @Test
+    public void toOffsetDateTimeTest() throws ConversionException {
+        OffsetDateTime odt = OffsetDateTime.ofInstant(Instant.EPOCH, ZoneOffset.of("Z"));
+
+        // All zeroes for the instant and 'Z' in UTF-8.
+        assertThat(toOffsetDateTime(parseHexBinary("0000000000000000000000005a")), is(odt));
+
+        odt = OffsetDateTime.of(LocalDate.of(1999, Month.AUGUST, 3), LocalTime.NOON, ZoneOffset.of("+09:00"));
+        assertThat(toOffsetDateTime(parseHexBinary("0000000037a65b30000000002b30393a3030")), is(odt));
+    }
+
+    @Test(expected = ConversionException.class)
+    public void toOffsetDateTimeInvalidOffsetTest() throws ConversionException {
+        // 'ZZ' is not a valid offset.
+        toOffsetDateTime(parseHexBinary("0000000000000000000000005a5a"));
+    }
+
+
+    @Test
+    public void fromZonedDateTimeTest() throws ConversionException {
+        ZonedDateTime zdt = ZonedDateTime.ofInstant(Instant.EPOCH, ZoneId.of("Z"));
+
+        // All zeroes for the instant and 'Z' in UTF-8.
+        assertThat(fromZonedDateTime(zdt), is(parseHexBinary("0000000000000000000000005a")));
+
+        zdt = ZonedDateTime.ofInstant(Instant.EPOCH, ZoneId.of("Japan"));
+        assertThat(fromZonedDateTime(zdt), is(parseHexBinary("0000000000000000000000004a6170616e")));
+
+        zdt = ZonedDateTime.of(LocalDate.of(1999, Month.AUGUST, 3), LocalTime.NOON, ZoneId.of("Europe/Amsterdam"));
+
+        assertThat(fromZonedDateTime(zdt),
+                is(parseHexBinary("0000000037a6bda0000000004575726f70652f416d7374657264616d")));
+    }
+
+    @Test
+    public void toZonedDateTimeTest() throws ConversionException {
+        ZonedDateTime zdt = ZonedDateTime.ofInstant(Instant.EPOCH, ZoneId.of("Z"));
+
+        // All zeroes for the instant and 'Z' in UTF-8.
+        assertThat(toZonedDateTime(parseHexBinary("0000000000000000000000005a")), is(zdt));
+
+        zdt = ZonedDateTime.of(LocalDate.of(1999, Month.AUGUST, 3), LocalTime.NOON, ZoneId.of("Japan"));
+        assertThat(toZonedDateTime(parseHexBinary("0000000037a65b30000000004a6170616e")), is(zdt));
+    }
+
+    @Test(expected = ConversionException.class)
+    public void toZonedDateTimeInvalidZoneTest() throws ConversionException {
+        // 'ZZ' is not a valid zone id.
+        toZonedDateTime(parseHexBinary("0000000000000000000000005a5a"));
     }
 
 

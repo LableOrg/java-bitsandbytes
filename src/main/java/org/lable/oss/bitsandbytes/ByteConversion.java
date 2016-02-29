@@ -20,8 +20,9 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.time.*;
 
-import static org.lable.oss.bitsandbytes.ByteMangler.flipTheFirstBit;
+import static org.lable.oss.bitsandbytes.ByteMangler.*;
 
 /**
  * Convert Java primitives to and from byte arrays for storage. These methods are useful when such operations happen
@@ -331,9 +332,136 @@ public class ByteConversion {
         assertNotNull(bytes);
         // 8 bytes for the scale (int) and at least 1 byte for the value.
         assertAtLeastNumBytes(bytes, 5);
-        int scale = toInt(ByteMangler.shrink(4, bytes));
+        int scale = toInt(shrink(4, bytes));
 
-        return new BigDecimal(new BigInteger(ByteMangler.chomp(4, bytes)), scale);
+        return new BigDecimal(new BigInteger(chomp(4, bytes)), scale);
+    }
+
+
+    /**
+     * Convert an {@link Instant} to bytes.
+     * <p>
+     * The first eight bytes represent the seconds since the epoch, the remaining four bytes are the nanosecond
+     * adjustment.
+     *
+     * @param input Input value.
+     * @return Bytes.
+     * @throws ConversionException Thrown when the input is null.
+     */
+    public static byte[] fromInstant(Instant input) throws ConversionException {
+        assertNotNull(input);
+        long seconds = input.getEpochSecond();
+        int nano = input.getNano();
+        return ByteBuffer.allocate(12).putLong(seconds).putInt(nano).array();
+    }
+
+    /**
+     * Convert a byte array to an {@link Instant}.
+     *
+     * @param bytes Byte array.
+     * @return An {@link Instant}.
+     * @throws ConversionException Thrown when the input is not 12 bytes or is null.
+     */
+    public static Instant toInstant(byte[] bytes) throws ConversionException {
+        assertNotNull(bytes);
+        // 8 bytes for seconds since the Unix epoch, and 4 bytes for the nano-seconds part.
+        assertNumBytes(bytes, 12);
+        long seconds = toLong(shrink(8, bytes));
+        int nano = toInt(chomp(8, bytes));
+
+        return Instant.ofEpochSecond(seconds, nano);
+    }
+
+
+    /**
+     * Convert an {@link OffsetDateTime} to bytes.
+     * <p>
+     * The first eight bytes represent the seconds since the epoch, the next four bytes are the nanosecond
+     * adjustment. The remaining bytes are a string representing the time-zone offset ({@link ZoneOffset}).
+     *
+     * @param input Input value.
+     * @return Bytes.
+     * @throws ConversionException Thrown when the input is null.
+     */
+    public static byte[] fromOffsetDateTime(OffsetDateTime input) throws ConversionException {
+        assertNotNull(input);
+        Instant instant = input.toInstant();
+        String id = input.getOffset().getId();
+        return ByteMangler.add(fromInstant(instant), fromString(id));
+    }
+
+    /**
+     * Convert a byte array to an {@link OffsetDateTime}.
+     * <p>
+     * The first eight bytes represent the seconds since the epoch, the next four bytes are the nanosecond
+     * adjustment. The remaining bytes are a string representing the time-zone offset ({@link ZoneOffset}).
+     *
+     * @param bytes Byte array.
+     * @return An {@link OffsetDateTime}.
+     * @throws ConversionException Thrown when the input is not at least 13 bytes or is null, and when the time-zone
+     *                             offset found is invalid.
+     */
+    public static OffsetDateTime toOffsetDateTime(byte[] bytes) throws ConversionException {
+        assertNotNull(bytes);
+        // 12 bytes for the instant, at least 1 byte (i.e., 'Z') for the time-zone.
+        assertAtLeastNumBytes(bytes, 13);
+        Instant instant = toInstant(shrink(12, bytes));
+        String id = toString(chomp(12, bytes));
+
+        ZoneOffset zoneOffset;
+        try {
+            zoneOffset = ZoneOffset.of(id);
+        } catch (DateTimeException e) {
+            throw new ConversionException("Time-zone offset identifier could not be parsed or found: " + id);
+        }
+
+        return OffsetDateTime.ofInstant(instant, zoneOffset);
+    }
+
+
+    /**
+     * Convert a {@link ZonedDateTime} to bytes.
+     * <p>
+     * The first eight bytes represent the seconds since the epoch, the next four bytes are the nanosecond
+     * adjustment. The remaining bytes are a string representing the time-zone identifier ({@link ZoneId}).
+     *
+     * @param input Input value.
+     * @return Bytes.
+     * @throws ConversionException Thrown when the input is null.
+     */
+    public static byte[] fromZonedDateTime(ZonedDateTime input) throws ConversionException {
+        assertNotNull(input);
+        Instant instant = input.toInstant();
+        String id = input.getZone().getId();
+        return ByteMangler.add(fromInstant(instant), fromString(id));
+    }
+
+    /**
+     * Convert a byte array to a {@link ZonedDateTime}.
+     * <p>
+     * The first eight bytes represent the seconds since the epoch, the next four bytes are the nanosecond
+     * adjustment. The remaining bytes are a string representing the time-zone identifier ({@link ZoneId}).
+     *
+     * @param bytes Byte array.
+     * @return A {@link ZonedDateTime}.
+     * @throws ConversionException Thrown when the input is not at least 13 bytes or is null, and when the time-zone
+     *                             identifier found is invalid.
+     */
+    public static ZonedDateTime toZonedDateTime(byte[] bytes) throws ConversionException {
+        assertNotNull(bytes);
+        // 12 bytes for the instant, at least 1 byte (i.e., 'Z') for the time-zone.
+        assertAtLeastNumBytes(bytes, 13);
+        Instant instant = toInstant(shrink(12, bytes));
+        String id = toString(chomp(12, bytes));
+
+        ZoneId zoneId;
+        try {
+            zoneId = ZoneId.of(id);
+        } catch (DateTimeException e) {
+            throw new ConversionException("Time-zone identifier could not be parsed or found: " + id);
+        }
+
+        return ZonedDateTime.ofInstant(instant, zoneId);
     }
 
     /* Input validation helpers. */
