@@ -22,7 +22,7 @@ This library is available on Maven Central:
 <dependency>
     <groupId>org.lable.oss.bitsandbytes</groupId>
     <artifactId>bitsandbytes</artifactId>
-    <version>2.2</version>
+    <version>2.3</version>
 </dependency>
 ```
 
