@@ -16,13 +16,23 @@ Hadoop's MapReduce tasks.
 
 ## Installation
 
-This library is available on Maven Central:
+This library is available on Maven Central. The newest versions use the Java 8 API:
 
 ```
 <dependency>
     <groupId>org.lable.oss.bitsandbytes</groupId>
     <artifactId>bitsandbytes</artifactId>
-    <version>2.2</version>
+    <version>3.0</version>
+</dependency>
+```
+
+If you need a Java 7 version of this library, use the `2.*` versions:
+
+```
+<dependency>
+    <groupId>org.lable.oss.bitsandbytes</groupId>
+    <artifactId>bitsandbytes</artifactId>
+    <version>2.3</version>
 </dependency>
 ```
 
@@ -121,3 +131,6 @@ Or, specify the `LEXICOGRAPHIC_SORT` *NumberRepresentation* parameter for the sa
 byte[] resultMinusOne = ByteConversion.fromInt(-1, NumberRepresentation.LEXICOGRAPHIC_SORT);
 int minusOne = ByteConversion.toInt(resultMinusOne, NumberRepresentation.LEXICOGRAPHIC_SORT);
 ```
+
+The `3.*` series of this library adds support for the `Instant`,
+`OffsetDateTime`, and `ZonedDateTime` classes introduced in Java 8 as well.
