@@ -326,6 +326,33 @@ public class ByteConversionTest {
         toZonedDateTime(parseHexBinary("0000000000000000000000005a5a"));
     }
 
+    @Test
+    public void fromLocalDateTest() throws ConversionException {
+        LocalDate ldt = LocalDate.ofEpochDay(0);
+
+        assertThat(fromLocalDate(ldt), is("1970-01-01".getBytes()));
+        assertThat(fromLocalDate(ldt, ISO8601DateFormat.EXTENDED), is("1970-01-01".getBytes()));
+        assertThat(fromLocalDate(ldt, ISO8601DateFormat.BASIC), is("19700101".getBytes()));
+    }
+
+    @Test
+    public void toLocalDateTest() throws ConversionException {
+        LocalDate ldt = LocalDate.ofEpochDay(0);
+
+        assertThat(toLocalDate("19700101".getBytes()), is(ldt));
+        assertThat(toLocalDate("1970-01-01".getBytes()), is(ldt));
+    }
+
+    @Test(expected = ConversionException.class)
+    public void toLocalDateInvalidInputTest() throws ConversionException {
+        toLocalDate("123456789".getBytes());
+    }
+
+    @Test(expected = ConversionException.class)
+    public void toLocalDateInvalidDateTest() throws ConversionException {
+        toLocalDate("1999-13-50".getBytes());
+    }
+
 
     @Test
     public void numberRepresentationTest() {

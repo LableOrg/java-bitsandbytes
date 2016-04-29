@@ -21,6 +21,7 @@ import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.time.*;
+import java.time.format.DateTimeParseException;
 
 import static org.lable.oss.bitsandbytes.ByteMangler.*;
 
@@ -464,6 +465,76 @@ public class ByteConversion {
         return ZonedDateTime.ofInstant(instant, zoneId);
     }
 
+
+    /**
+     * Convert a {@link LocalDate} to bytes.
+     * <p>
+     * This simply turns the ISO-8601 string representation of the date (e.g., "1999-12-31") into bytes.
+     *
+     * @param input Input value.
+     * @return Bytes.
+     * @throws ConversionException Thrown when the input is null.
+     */
+    public static byte[] fromLocalDate(LocalDate input) throws ConversionException {
+        return fromLocalDate(input, ISO8601DateFormat.EXTENDED);
+    }
+
+    /**
+     * Convert a {@link LocalDate} to bytes, using the basic or extended ISO-8601 notation.
+     * <p>
+     * This simply turns the ISO-8601 string representation of the date (e.g., "1999-12-31" or "19991231") into bytes.
+     *
+     * @param input Input value.
+     * @return Bytes.
+     * @throws ConversionException Thrown when the input is null.
+     */
+    public static byte[] fromLocalDate(LocalDate input, ISO8601DateFormat iso8601DateFormat)
+            throws ConversionException {
+        assertNotNull(input);
+        String iso8601 = input.toString();
+        switch (iso8601DateFormat) {
+            case BASIC:
+                String basic = iso8601.substring(0, 4) + iso8601.substring(5, 7) + iso8601.substring(8, 10);
+                return basic.getBytes();
+            default:
+                // Extended notation.
+                return iso8601.getBytes();
+        }
+    }
+
+    /**
+     * Convert a byte array to a {@link LocalDate}.
+     * <p>
+     * The input should represent a string in the ISO-8601 notation. If the input is 8 bytes long, the basic compact
+     * notation is assumed (19991231), otherwise, the extended notation (1999-12-31).
+     *
+     * @param bytes Byte array.
+     * @return A {@link LocalDate}.
+     * @throws ConversionException Thrown when the input is not 8 or 10 bytes long or is null, and when the date
+     *                             could not be parsed.
+     */
+    public static LocalDate toLocalDate(byte[] bytes) throws ConversionException {
+        assertNotNull(bytes);
+
+        String iso8601;
+        if (bytes.length == 8) {
+            // Add the dashes to get YYYY-MM-DD.
+            iso8601 = String.format("%s-%s-%s",
+                    new String(bytes, 0, 4), new String(bytes, 4, 2), new String(bytes, 6, 2));
+        } else if (bytes.length == 10) {
+            iso8601 = new String(bytes);
+        } else {
+            throw new ConversionException("Expected 8 or 10 bytes of input, got " + bytes.length + ".");
+        }
+
+        try {
+            return LocalDate.parse(iso8601);
+        } catch (DateTimeParseException e) {
+            throw new ConversionException("Failed to parse date.", e);
+        }
+    }
+
+
     /* Input validation helpers. */
 
     static void assertNumBytes(byte[] bytes, int n) throws ConversionException {
@@ -492,6 +563,10 @@ public class ByteConversion {
         public ConversionException(String message) {
             super(message);
         }
+
+        public ConversionException(String message, Throwable e) {
+            super(message, e);
+        }
     }
 
     /**
@@ -506,5 +581,19 @@ public class ByteConversion {
          * The byte representation of both negative and positive numbers sorts naturally.
          */
         LEXICOGRAPHIC_SORT
+    }
+
+    /**
+     * Specify how dates are converted to and from their ISO-8601 notation in bytes.
+     */
+    public enum ISO8601DateFormat {
+        /**
+         * The compact notation without dashes.
+         */
+        BASIC,
+        /**
+         * The extended human-friendly notation, including dashes.
+         */
+        EXTENDED
     }
 }
