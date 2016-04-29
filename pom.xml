@@ -27,7 +27,7 @@
 
   <groupId>org.lable.oss.bitsandbytes</groupId>
   <artifactId>bitsandbytes</artifactId>
-  <version>3.1</version>
+  <version>3.2-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>Bits-and-Bytes</name>
@@ -53,7 +53,7 @@
     <connection>scm:git:git@github.com:LableOrg/java-bitsandbytes.git</connection>
     <developerConnection>scm:git:git@github.com:LableOrg/java-bitsandbytes.git</developerConnection>
     <url>https://github.com/LableOrg/java-bitsandbytes</url>
-    <tag>v3.1</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <developers>
