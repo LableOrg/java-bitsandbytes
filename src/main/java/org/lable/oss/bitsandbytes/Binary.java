@@ -28,7 +28,7 @@ public class Binary {
      * Convert a binary string representation of a byte array to that byte array. This method purposely ignores any
      * characters that are not 1 or 0, so you can use spaces and any other punctuation deemed suitable to improve
      * readability.
-     * <p/>
+     * <p>
      * The following input strings all return the same byte array:
      * <ul>
      * <li>"0000001000001111"</li>
