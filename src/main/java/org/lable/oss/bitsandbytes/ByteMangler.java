@@ -31,15 +31,15 @@ public class ByteMangler {
 
     /**
      * Reverse the bit-order.
-     * <p/>
+     * <p>
      * So if the input is:
      * <ul>
-     * <li>11111111 00000001</li>
+     *   <li>11111111 00000001</li>
      * </ul>
-     * <p/>
+     * <p>
      * Then the output will be:
      * <ul>
-     * <li>10000000 11111111</li>
+     *   <li>10000000 11111111</li>
      * </ul>
      *
      * @param input Input.
@@ -68,15 +68,15 @@ public class ByteMangler {
 
     /**
      * Flip all bits.
-     * <p/>
+     * <p>
      * So if the input is:
      * <ul>
-     * <li>11111111 10101010</li>
+     *   <li>11111111 10101010</li>
      * </ul>
-     * <p/>
+     * <p>
      * Then the output will be:
      * <ul>
-     * <li>00000000 01010101</li>
+     *   <li>00000000 01010101</li>
      * </ul>
      *
      * @param input Input.
