@@ -30,8 +30,7 @@ This library is available on Maven Central:
 
 ### Binary
 
-In unit tests the `Binary` class can aid in making the testing of code that
-performs bit-wise operations more readable.
+In unit tests and debugging output the `Binary` class can aid in bit-wise operations more readable.
 
 For example:
 
@@ -45,6 +44,23 @@ assertThat(someBitManipulatingMethodUnderTest(0),
            is(Binary.decode("10000000 10101010 00001111 00000000")));
 ```
 
+To encode a `byte[]` into a string of ones and zeroes:
+
+```java
+byte[] input = "a1".getBytes();
+
+// Using the defaults.
+//   0110000100110001
+String out = Binary.encode(input);
+
+// Or specify formatting.
+//   01100001 10000100
+String spaceSeparated = Binary.encode(input, false, true);
+
+//   [01100001][10000100]
+String delimited = Binary.encode(input, true, false);
+```
+
 ### ByteMangler
 
 The `ByteMangler` class contains a number of methods that aim to make working
@@ -52,7 +68,33 @@ with byte arrays a little more pleasant:
 
 ```java
 // Concatenate any number of byte arrays in a single call.
-byte[] result = ByteMangler.add(part, anotherPart, andAnotherPart, yetAnotherPart);
+byte[] cat = ByteMangler.add(part, anotherPart, andAnotherPart, yetAnotherPart);
+
+// Shrink a byte[], discarding the rest. Output here is the same as "1234".getBytes().
+byte[] fourBytes = ByteMangler.shrink("12345".getBytes(), 4);
+
+// Remove a number of bytes from the start of a byte[]. Output here is the same as "2345".getBytes().
+byte[] againFourBytes = ByteMangler.chomp("12345".getBytes(), 1);
+
+// Flip all bits in a byte[].
+byte[] normal = Binary.decode("11001111 00000001");
+// Equal to Binary.decode("00110000 11111110").
+byte[] flipped = ByteMangler.flip(unflipped);
+
+// Reverse the order of bits in a byte[].
+// Equal to Binary.decode("10000000 11110011").
+byte[] reversed = ByteMangler.reverse(normal);
+```
+
+Analogous to String's `split` method, `ByteMangler` provides a `split` method as well:
+
+```java
+// Split a byte[] on 0x00 bytes:
+byte[] input = Binary.decode("11110011 00000000 00000001 10000001");
+// The output list will contain two byte[] equalt to:
+//   * Binary.decode("11110011")
+//   * Binary.decode("00000001 10000001")
+List<byte[]> parts = ByteMangler.split(input, new byte[]{0x00});
 ```
 
 ### BitMask
@@ -71,6 +113,20 @@ byte[] mask = BitMask.bitMask(2, 3, 1, 4);
 // To start the mask with ones, pass 0 as the first argument.
 // 11111111:
 byte[] anotherMask = BitMask.bitMask(0, 8);
+```
+
+### BytePrinter
+
+When you end up with `byte[]` that contain printable UTF-8 encoded text as well as 
+some unprintable control characters (e.g., `null` byte separators), logging these
+for debugging can be cumbersome. The `BytePrinter` class can help in these cases, 
+by creating a string where valid UTF-8 sequences are left as-is, and unprintable
+characters are replaced by printable escape sequences:
+ 
+```java
+byte[] unprintable = ByteMangler.add("abc".getBytes(), new byte[]{0x00}, "def".getBytes());
+// "abc\x00def"
+String printable = BytePrinter.utf8Escaped(unprintable);
 ```
 
 ### ByteConversion
@@ -94,11 +150,11 @@ byte[] result = ByteConversion.fromInt(Integer.MAX_VALUE);
 
 In cases where you want the byte array of an int or long to be naturally
 sortable (which is often what you want when they are used as part of a HBase
-row-key), *two's complement* causes negative numbers to be sorted after
+row-key), *two's complement* causes negative numbers to be sorted *after*
 positive numbers.
 
-Use `ByteMangler` to flip the first bit when you read and write the byte
-representation of an `int` or `long` to prevent this:
+To prevent this, use `ByteMangler` to flip the first bit when you read and 
+write the byte representation of an `int` or `long`:
 
 ```java
 // 0x7F 0xFF 0xFF 0xFF:
