@@ -304,4 +304,48 @@ public class ByteMangler {
         }
         return false;
     }
+
+    /**
+     * Remove all occurrences of {@code target} from the input.
+     *
+     * @param input  Input.
+     * @param target Removal target.
+     * @return The input byte array, minus any occurrence of {@code target}.
+     */
+    public static byte[] remove(byte[] input, byte[] target) {
+        return replace(input, target, null);
+    }
+
+    /**
+     * Replace occurrences of a byte sequence with another byte sequence.
+     *
+     * @param input       Input.
+     * @param target      Replacement target.
+     * @param replacement Replacement.
+     * @return The input byte array, with any occurrence of {@code target} replaced by @{code replacement}.
+     */
+    public static byte[] replace(byte[] input, byte[] target, byte[] replacement) {
+        if (target == null || input == null) return input;
+        if (replacement == null) replacement = new byte[0];
+
+        List<byte[]> parts = split(input, target);
+
+        // Target not found in input string.
+        if (parts.size() < 2) return input;
+
+        int length = input.length + ((parts.size() - 1) * (replacement.length - target.length));
+        byte[] output = new byte[length];
+        int current = 0;
+        for (byte[] part : parts) {
+            System.arraycopy(part, 0, output, current, part.length);
+            current += part.length;
+
+            if (current >= output.length) break;
+
+            System.arraycopy(replacement, 0, output, current, replacement.length);
+            current += replacement.length;
+        }
+
+        return output;
+    }
 }
