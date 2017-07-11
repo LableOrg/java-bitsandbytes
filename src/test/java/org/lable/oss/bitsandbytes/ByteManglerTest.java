@@ -471,8 +471,64 @@ public class ByteManglerTest {
 
 
     @Test
-    public void oneHundredPercentCodeCoverageObsession() {
-        // Because 99% code coverage is awful.
-        new ByteMangler();
+    public void replaceSimpleTest() {
+        byte[] input = "abcdefghijklmnopqrstuvwxyz".getBytes();
+        byte[] expected = "abcdefgXXXXXXXXlmnopqrstuvwxyz".getBytes();
+
+        byte[] output = replace(input, "hijk".getBytes(), "XXXXXXXX".getBytes());
+
+        assertThat(output, is(expected));
+    }
+
+    @Test
+    public void replaceSimpleLargetTargetTest() {
+        byte[] input = "abcdefghijklmnopqrstuvwxyz".getBytes();
+        byte[] expected = ByteMangler.add("abcdefg".getBytes(), new byte[]{0}, "lmnopqrstuvwxyz".getBytes());
+
+        byte[] output = replace(input, "hijk".getBytes(), new byte[]{0});
+
+        assertThat(output, is(expected));
+    }
+
+    @Test
+    public void replaceMultipleTest() {
+        byte[] input = "abc--def--ghi--jkl--mno--pqr--stu--vwx--yz".getBytes();
+        byte[] expected = "abc#def#ghi#jkl#mno#pqr#stu#vwx#yz".getBytes();
+
+        byte[] output = replace(input, "--".getBytes(), "#".getBytes());
+
+        assertThat(output, is(expected));
+    }
+
+    @Test
+    public void replaceMinimalReplacementTest() {
+        byte[] input = "#".getBytes();
+        byte[] expected = "".getBytes();
+
+        assertThat(replace(input, "#".getBytes(), "".getBytes()), is(expected));
+        assertThat(replace(input, "#".getBytes(), null), is(expected));
+    }
+
+    @Test
+    public void replaceEmptyReplacementTest() {
+        byte[] input = "abcdefghijklmnopqrstuvwxyz".getBytes();
+        byte[] expected = "abcdefglmnopqrstuvwxyz".getBytes();
+
+        assertThat(replace(input, "hijk".getBytes(), null), is(expected));
+        assertThat(remove(input, "hijk".getBytes()), is(expected));
+    }
+
+    @Test
+    public void replaceNoActionTest() {
+        byte[] input = "abcdefghijklmnopqrstuvwxyz".getBytes();
+        byte[] expected = "abcdefghijklmnopqrstuvwxyz".getBytes();
+
+        assertThat(replace(input, "XXX".getBytes(), "ZZZ".getBytes()), is(expected));
+    }
+
+    @Test
+    public void replaceNullInputTest() {
+        assertThat(replace(null, "XXX".getBytes(), "ZZZ".getBytes()), is(nullValue()));
+        assertThat(replace("XXX".getBytes(), null, "ZZZ".getBytes()), is("XXX".getBytes()));
     }
 }
