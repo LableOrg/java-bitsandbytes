@@ -22,7 +22,7 @@ This library is available on Maven Central. The newest versions use the Java 8 A
 <dependency>
     <groupId>org.lable.oss.bitsandbytes</groupId>
     <artifactId>bitsandbytes</artifactId>
-    <version>3.1</version>
+    <version>3.2</version>
 </dependency>
 ```
 
@@ -32,7 +32,7 @@ If you need a Java 7 version of this library, use the `2.*` versions:
 <dependency>
     <groupId>org.lable.oss.bitsandbytes</groupId>
     <artifactId>bitsandbytes</artifactId>
-    <version>2.3</version>
+    <version>2.4</version>
 </dependency>
 ```
 
