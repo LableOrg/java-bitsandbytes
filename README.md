@@ -91,10 +91,22 @@ Analogous to String's `split` method, `ByteMangler` provides a `split` method as
 ```java
 // Split a byte[] on 0x00 bytes:
 byte[] input = Binary.decode("11110011 00000000 00000001 10000001");
-// The output list will contain two byte[] equalt to:
+// The output list will contain two byte[] equal to:
 //   * Binary.decode("11110011")
 //   * Binary.decode("00000001 10000001")
 List<byte[]> parts = ByteMangler.split(input, new byte[]{0x00});
+```
+
+And a `replace` method:
+
+```java
+// Replace all occurrences of 0xFF with 0x00 0x00:
+byte[] input = Binary.decode("11110011 11111111 00000000 00000001 11111111 10000001");
+
+// 11110011 00000000 00000000 00000000 00000001 00000000 00000000 10000001.
+byte[] output = ByteMangler.replace(input, Binary.decode("11111111"), new byte[]{0, 0});
+
+
 ```
 
 ### BitMask
