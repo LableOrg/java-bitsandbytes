@@ -41,42 +41,7 @@ public class Binary {
      * @return The corresponding byte array.
      */
     public static byte[] decode(String binary) {
-        if (binary == null) {
-            return new byte[]{};
-        }
-
-        StringBuilder cleanInput = new StringBuilder();
-        for (char c : binary.toCharArray()) {
-            // Strip out anything that isn't a 1 or 0.
-            if (c == '0' || c == '1') {
-                cleanInput.append(c);
-            }
-        }
-
-        char[] chars = cleanInput.toString().toCharArray();
-
-        int targetLength = chars.length / 8;
-        int remainder = chars.length % 8;
-        if (remainder != 0) {
-            targetLength += 1;
-        }
-
-        byte[] output = new byte[targetLength];
-        // If the input was not neatly divisible by 8, pad out the first byte with 0s by starting later in the loop.
-        int bitCounter = remainder == 0 ? 0 : 8 - remainder;
-        int byteCounter = 0;
-        for (char bit : chars) {
-            if (bit == '1') {
-                output[byteCounter] |= 1 << (7 - bitCounter);
-            }
-
-            bitCounter++;
-            if (bitCounter == 8) {
-                byteCounter++;
-                bitCounter = 0;
-            }
-        }
-        return output;
+        return ByteVisualization.ONES_AND_ZEROES.parse(binary);
     }
 
     /**
@@ -86,18 +51,7 @@ public class Binary {
      * @return A string of ones and zeroes, or "NULL" if the input is null.
      */
     public static String encode(byte[] input) {
-        if (input == null) {
-            return "NULL";
-        }
-
-        StringBuilder output = new StringBuilder();
-        for (byte b : input) {
-            for (int i = 7; i > -1; i--) {
-                output.append((b >> i & 0x1) == 1 ? '1' : '0');
-            }
-        }
-
-        return output.toString();
+        return ByteVisualization.ONES_AND_ZEROES.visualize(input);
     }
 
     /**
