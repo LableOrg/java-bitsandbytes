@@ -46,6 +46,14 @@ public class ByteReaderTest {
     }
 
     @Test
+    public void roundTripTest() {
+        byte[] output = unescape("€");
+
+        assertThat(output, is(new byte[]{(byte) 0xE2, (byte) 0x82, (byte) 0xAC}));
+        assertThat(BytePrinter.utf8Escaped(output), is("€"));
+    }
+
+    @Test
     public void asHexValueTest() {
         assertThat(asHexValue('A'), is(10));
         assertThat(asHexValue('B'), is(11));

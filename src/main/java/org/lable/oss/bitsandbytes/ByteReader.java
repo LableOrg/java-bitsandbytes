@@ -16,6 +16,7 @@
 package org.lable.oss.bitsandbytes;
 
 import java.io.ByteArrayOutputStream;
+import java.nio.charset.Charset;
 
 /**
  * Static utility methods for reading string representations of byte sequences.
@@ -29,7 +30,7 @@ public class ByteReader {
 
     /**
      * Convert a string consisting of characters and byte escape sequences representing bytes to the byte array it
-     * represents.
+     * represents. The byte array returned encodes characters as UTF-8.
      * <p>
      * Escape sequences look like {@code \xf4}.
      * <p>
@@ -59,8 +60,10 @@ public class ByteReader {
                     continue;
                 }
             }
-
-            baos.write(c);
+            byte[] utf8 = Character.toString(c).getBytes(Charset.forName("UTF-8"));
+            for (byte b : utf8) {
+                baos.write(b);
+            }
         }
 
         return baos.toByteArray();
