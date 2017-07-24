@@ -76,9 +76,9 @@ public class BytePrinter {
      * Convert a sequence of bytes into a printable string, where a selection of non-whitespace, basic ASCII characters
      * are printed as-is, and any other bytes are output in an escaped hexadecimal notation — e.g., {@code \xff}.
      * <p>
-     * The characters that are left as-is are the alphanumerical ASCII characters, and the special characters {@value
-     * BASIC_SPECIAL_CHARS}. Double and single quotation marks are escaped as well (this makes the strings more
-     * convenient for use in programming and shell environments).
+     * The characters that are left as-is are the alphanumerical ASCII characters, and the special characters
+     * <code>~!@#$%^&amp;*()-_=+[]{}|;:,.&lt;&gt;/?}</code>. Double and single quotation marks are escaped as well (this
+     * makes the strings more convenient for use in programming and shell environments).
      *
      * @param input Input bytes.
      * @return Printable string.
