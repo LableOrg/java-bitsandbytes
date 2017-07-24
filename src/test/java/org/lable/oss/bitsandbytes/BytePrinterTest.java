@@ -17,9 +17,13 @@ package org.lable.oss.bitsandbytes;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.lable.oss.bitsandbytes.BytePrinter.*;
+import static org.lable.oss.bitsandbytes.BytePrinter.nonBasicsEscaped;
 
 public class BytePrinterTest {
     @Test
@@ -100,6 +104,20 @@ public class BytePrinterTest {
     }
 
     @Test
+    public void nonBasicsEscapedTest() {
+        assertThat(nonBasicsEscaped(Binary.decode("11011000 10000000")), is("\\xd8\\x80"));
+        assertThat(nonBasicsEscaped("Test test".getBytes()), is("Test\\x20test"));
+        assertThat(nonBasicsEscaped(new byte[0]), is(""));
+    }
+
+    @Test
+    public void allEscapedTest() {
+        assertThat(allEscaped(Binary.decode("11011000 10000000")), is("\\xd8\\x80"));
+        assertThat(allEscaped("Test test".getBytes()), is("\\x54\\x65\\x73\\x74\\x20\\x74\\x65\\x73\\x74"));
+        assertThat(allEscaped(new byte[0]), is(""));
+    }
+
+    @Test
     public void isPrintableCharacterTest() {
         // Control-character.
         assertThat(isPrintableCharacter(0), is(false));
@@ -116,6 +134,27 @@ public class BytePrinterTest {
     }
 
     @Test
+    public void isBasicPrintableCharacterTest() {
+        for (int c = '0'; c <= '9'; c++) {
+            assertThat(isBasicPrintableCharacter(c), is(true));
+        }
+        for (int c = 'A'; c <= 'Z'; c++) {
+            assertThat(isBasicPrintableCharacter(c), is(true));
+        }
+        for (int c = 'a'; c <= 'z'; c++) {
+            assertThat(isBasicPrintableCharacter(c), is(true));
+        }
+        for (char c : "`~!@#$%^&*()-_=+[]{}|;:,.<>/?".toCharArray()) {
+            assertThat(isBasicPrintableCharacter(c), is(true));
+        }
+
+        assertThat(isBasicPrintableCharacter('€'), is(false));
+        assertThat(isBasicPrintableCharacter(' '), is(false));
+        assertThat(isBasicPrintableCharacter('\''), is(false));
+        assertThat(isBasicPrintableCharacter('"'), is(false));
+    }
+
+    @Test
     public void escapeByteTest() {
         assertThat(escapeByte((byte) 0), is("\\x00"));
         assertThat(escapeByte((byte) 2), is("\\x02"));
@@ -124,7 +163,6 @@ public class BytePrinterTest {
         assertThat(escapeByte((byte) -16), is("\\xf0"));
         assertThat(escapeByte((byte) -1), is("\\xff"));
     }
-
 
     @Test
     public void oneHundredPercentCodeCoverageObsession() {

@@ -18,9 +18,13 @@ package org.lable.oss.bitsandbytes;
 /**
  * Static utility methods for printing byte sequences.
  *
+ * @see #allEscaped(byte[]) (byte[])
+ * @see #nonBasicsEscaped(byte[])
  * @see #utf8Escaped(byte[])
  */
 public class BytePrinter {
+    public static final String BASIC_SPECIAL_CHARS = "`~!@#$%^&*()-_=+[]{}|;:,.<>/?";
+
     static final char[] HEX_CHARS =
             new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
@@ -48,6 +52,54 @@ public class BytePrinter {
         // Static utility class.
     }
 
+
+    /**
+     * Convert a sequence of bytes into a printable string, where all bytes are output in an escaped hexadecimal
+     * notation — e.g., {@code \xff}.
+     *
+     * @param input Input bytes.
+     * @return Printable string.
+     * @see #nonBasicsEscaped(byte[])
+     * @see #utf8Escaped(byte[])
+     */
+    public static String allEscaped(byte[] input) {
+        StringBuilder builder = new StringBuilder();
+
+        for (byte b : input) {
+            builder.append(escapeByte(b));
+        }
+
+        return builder.toString();
+    }
+
+    /**
+     * Convert a sequence of bytes into a printable string, where a selection of non-whitespace, basic ASCII characters
+     * are printed as-is, and any other bytes are output in an escaped hexadecimal notation — e.g., {@code \xff}.
+     * <p>
+     * The characters that are left as-is are the alphanumerical ASCII characters, and the special characters {@value
+     * BASIC_SPECIAL_CHARS}. Double and single quotation marks are escaped as well (this makes the strings more
+     * convenient for use in programming and shell environments).
+     *
+     * @param input Input bytes.
+     * @return Printable string.
+     * @see #allEscaped(byte[])
+     * @see #utf8Escaped(byte[])
+     */
+    public static String nonBasicsEscaped(byte[] input) {
+        StringBuilder builder = new StringBuilder();
+
+        for (byte b : input) {
+            int c = b & 0xFF;
+            if (isBasicPrintableCharacter(c)) {
+                builder.append((char) c);
+            } else {
+                builder.append(escapeByte(b));
+            }
+        }
+
+        return builder.toString();
+    }
+
     /**
      * Convert a sequence of bytes into a printable string, where valid UTF-8 printable characters are output as-is,
      * and non-printable characters and any other bytes not representing printable text are output in an escaped
@@ -55,6 +107,8 @@ public class BytePrinter {
      *
      * @param input Input bytes.
      * @return Printable string.
+     * @see #allEscaped(byte[])
+     * @see #nonBasicsEscaped(byte[])
      */
     public static String utf8Escaped(byte[] input) {
         StringBuilder builder = new StringBuilder();
@@ -153,6 +207,13 @@ public class BytePrinter {
                 type != Character.SPACE_SEPARATOR &&
                 type != Character.LINE_SEPARATOR &&
                 type != Character.PARAGRAPH_SEPARATOR;
+    }
+
+    static boolean isBasicPrintableCharacter(int c) {
+        return c == '!'
+                || (c >= '#' && c <= '&')
+                || (c >= '(' && c <= '[')
+                || (c >= ']' && c <= '~');
     }
 
     static int writeEscaped(StringBuilder builder, byte... bytes) {
