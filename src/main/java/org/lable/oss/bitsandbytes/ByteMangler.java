@@ -141,10 +141,13 @@ public class ByteMangler {
      * @return The original input, with the first bit flipped.
      */
     public static byte[] flipTheFirstBit(byte[] orig) {
-        if (orig != null && orig.length > 0) {
-            orig[0] = (byte) (orig[0] ^ 1 << 7);
+        if (orig == null) return null;
+        byte[] out = orig.clone();
+
+        if (out.length > 0) {
+            out[0] = (byte) (out[0] ^ 1 << 7);
         }
-        return orig;
+        return out;
     }
 
     /**
@@ -155,10 +158,7 @@ public class ByteMangler {
      * @return A copy of the original byte array, possibly one byte longer than it was.
      */
     public static byte[] plusOne(byte[] orig) {
-        if (orig == null) {
-            return null;
-        }
-
+        if (orig == null) return null;
         byte[] out = orig.clone();
 
         plus:
