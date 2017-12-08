@@ -22,7 +22,7 @@ This library is available on Maven Central. The newest versions use the Java 8 A
 <dependency>
     <groupId>org.lable.oss.bitsandbytes</groupId>
     <artifactId>bitsandbytes</artifactId>
-    <version>3.2</version>
+    <version>3.4</version>
 </dependency>
 ```
 
@@ -32,7 +32,7 @@ If you need a Java 7 version of this library, use the `2.*` versions:
 <dependency>
     <groupId>org.lable.oss.bitsandbytes</groupId>
     <artifactId>bitsandbytes</artifactId>
-    <version>2.4</version>
+    <version>2.5</version>
 </dependency>
 ```
 
@@ -117,6 +117,18 @@ byte[] input = Binary.decode("11110011 11111111 00000000 00000001 11111111 10000
 byte[] output = ByteMangler.replace(input, Binary.decode("11111111"), new byte[]{0, 0});
 
 
+```
+
+### ByteComparison
+
+The `ByteComparison` class provides a couple of methods useful for comparing byte arrays:
+
+```java
+byte[] input = new byte[]{0, 1, 2, 3, 4, 5};
+
+boolean res1 = ByteComparison.startsWith(input, new byte[]{0, 1, 2}); // True.
+boolean res2 = ByteComparison.endsWith(input, new byte[]{3, 4, 5}); // Also true.
+boolean res3 = ByteComparison.contains(input, new byte[]{2, 3}); // True again.
 ```
 
 ### BitMask
