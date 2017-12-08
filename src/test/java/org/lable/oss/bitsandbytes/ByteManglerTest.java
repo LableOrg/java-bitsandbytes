@@ -165,16 +165,16 @@ public class ByteManglerTest {
     @Test
     public void flipTheFirstBitBasicTest() {
         byte[] input = Binary.decode("00000001");
-        flipTheFirstBit(input);
-        assertThat(input, is(Binary.decode("10000001")));
+        byte[] output = flipTheFirstBit(input);
+        assertThat(output, is(Binary.decode("10000001")));
 
         input = Binary.decode("11110001");
-        flipTheFirstBit(input);
-        assertThat(input, is(Binary.decode("01110001")));
+        output = flipTheFirstBit(input);
+        assertThat(output, is(Binary.decode("01110001")));
 
         input = Binary.decode("11110001 00000000");
-        flipTheFirstBit(input);
-        assertThat(input, is(Binary.decode("01110001 00000000")));
+        output = flipTheFirstBit(input);
+        assertThat(output, is(Binary.decode("01110001 00000000")));
     }
 
     @Test
