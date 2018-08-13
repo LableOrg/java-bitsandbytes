@@ -40,7 +40,7 @@ If you need a Java 7 version of this library, use the `2.*` versions:
 
 ### Binary
 
-In unit tests and debugging output the `Binary` class can aid in bit-wise operations more readable.
+In unit tests and debugging output the `Binary` class can aid in making bit-wise operations more readable.
 
 For example:
 
@@ -69,6 +69,14 @@ String spaceSeparated = Binary.encode(input, false, true);
 
 //   [01100001][10000100]
 String delimited = Binary.encode(input, true, false);
+```
+
+### Hexadecimal
+
+Turn hexadecimal string representations into byte arrays, and vice versa.
+
+```java
+byte[] java = Hex.decode("0xCAFEBABE");
 ```
 
 ### ByteMangler

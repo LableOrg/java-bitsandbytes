@@ -24,7 +24,7 @@ import static org.lable.oss.bitsandbytes.Binary.decode;
 
 public class BinaryTest {
     @Test
-    public void encodeBasicTest() {
+    public void decodeBasicTest() {
         assertThat(decode("00000000"), is(new byte[]{0}));
         assertThat(decode("11111111"), is(new byte[]{-1}));
         assertThat(decode("1"), is(new byte[]{1}));
@@ -42,31 +42,32 @@ public class BinaryTest {
     }
 
     @Test
-    public void encodeNullTest() {
+    public void decodeNullTest() {
         assertThat(decode(null), is(new byte[]{}));
     }
 
     @Test
-    public void encodeEmptyTest() {
+    public void decodeEmptyTest() {
         assertThat(decode(""), is(new byte[]{}));
         assertThat(decode(" "), is(new byte[]{}));
     }
 
 
     @Test
-    public void decodeNullTest() {
+    public void encodeNullTest() {
         assertThat(encode(null), is("NULL"));
     }
 
     @Test
-    public void decodeEmptyTest() {
+    public void encodeEmptyTest() {
         assertThat(encode(new byte[]{}), is(""));
     }
 
     @Test
-    public void decodeBasicTest() {
+    public void encodeBasicTest() {
         assertThat(encode(new byte[]{0}), is("00000000"));
         assertThat(encode(new byte[]{-1}), is("11111111"));
+        assertThat(encode(new byte[]{(byte) 0b11111111}), is("11111111"));
         assertThat(encode(new byte[]{1}), is("00000001"));
         assertThat(encode(new byte[]{3}), is("00000011"));
         assertThat(encode(new byte[]{-16}), is("11110000"));
@@ -74,7 +75,7 @@ public class BinaryTest {
     }
 
     @Test
-    public void decodeDecoratedTest() {
+    public void encodeDecoratedTest() {
         assertThat(encode(new byte[]{0}, true, false), is("[00000000]"));
         assertThat(encode(new byte[]{0}, true, true), is("[00000000]"));
         assertThat(encode(new byte[]{0}, false, false), is("00000000"));

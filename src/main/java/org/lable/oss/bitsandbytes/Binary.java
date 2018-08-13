@@ -79,7 +79,7 @@ public class Binary {
             if (wrapBytesInBraces) {
                 output.append('[');
             }
-            output.append(binary.substring(byteCount * i, (byteCount * i) + 8));
+            output.append(binary, byteCount * i, (byteCount * i) + 8);
             if (wrapBytesInBraces) {
                 output.append(']');
             }

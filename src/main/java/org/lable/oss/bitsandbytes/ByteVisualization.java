@@ -96,6 +96,64 @@ public enum ByteVisualization {
         }
     },
     /**
+     * Represent a byte as a hexadecimal string, e.g., {@code C0} for {@code 192}.
+     */
+    HEXADECIMAL {
+        @Override
+        public String visualize(byte input) {
+            int high = input >> 4 & 0x0F;
+            int low = input & 0x0F;
+            return new String(new char[]{
+                    (high > 9 ? (char) (high + 0x37) : (char) (high + 0x30)),
+                    (low > 9 ? (char) (low + 0x37) : (char) (low + 0x30))
+            });
+        }
+
+        @Override
+        public byte[] parse(String input) {
+            if (input == null) return new byte[0];
+            input = input.trim();
+
+            if (input.startsWith("0x") || input.startsWith("0X")) {
+                input = input.substring(2);
+            }
+
+            StringBuilder cleanInput = new StringBuilder();
+            for (char c : input.toCharArray()) {
+                // Strip out anything that isn't a 1 or 0.
+                if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f')) {
+                    cleanInput.append(c);
+                } else if (c >= 'A' && c <= 'F') {
+                    // Turn uppercase A–F into lowercase a–f.
+                    cleanInput.append((char) (c + 0x20));
+                }
+            }
+
+            char[] chars;
+            if (cleanInput.length() % 2 == 0) {
+                chars = cleanInput.toString().toCharArray();
+            } else {
+                // Prepend a '0' if the input string has an odd number of characters.
+                chars = new char[cleanInput.length() + 1];
+                chars[0] = '0';
+                cleanInput.getChars(0, cleanInput.length(), chars, 1);
+            }
+
+            int targetLength = chars.length / 2;
+            byte[] output = new byte[targetLength];
+
+            for (int i = 0; i < chars.length / 2; i++) {
+                output[i] = (byte) (value(chars[i * 2]) << 4 ^ value(chars[i * 2 + 1]));
+            }
+
+            return output;
+        }
+
+        private int value(char c) {
+            return c >= '0' && c <= '9' ? c - 0x30 : c - 0x57;
+        }
+    },
+    /**
      * Use Unicode Block Elements to represent each byte using two glyphs.
      */
     SQUARES {
