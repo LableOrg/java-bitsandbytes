@@ -19,9 +19,7 @@ import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.lable.oss.bitsandbytes.ByteVisualization.BRAILLE;
-import static org.lable.oss.bitsandbytes.ByteVisualization.ONES_AND_ZEROES;
-import static org.lable.oss.bitsandbytes.ByteVisualization.SQUARES;
+import static org.lable.oss.bitsandbytes.ByteVisualization.*;
 
 public class ByteVisualizationTest {
     @Test
@@ -74,6 +72,18 @@ public class ByteVisualizationTest {
     }
 
     @Test
+    public void hexadecimalVisualizeTest() {
+        // Limited. See BinaryTest for the full suite.
+        assertThat(HEXADECIMAL.visualize(new byte[]{0}), is("00"));
+    }
+
+    @Test
+    public void hexadecimalParseTest() {
+        // Limited. See BinaryTest for the full suite.
+        assertThat(HEXADECIMAL.parse("F0"), is(new byte[]{-16}));
+    }
+
+    @Test
     public void squaresVisualizeTest() {
         assertThat(SQUARES.visualize((byte) 0), is("  "));
         assertThat(SQUARES.visualize((byte) 1), is(" \u2598"));
@@ -112,8 +122,10 @@ public class ByteVisualizationTest {
 
     @Test
     public void sysOutTest() {
-        System.out.println(BRAILLE.visualize("TEST here!".getBytes()));
-        System.out.println(ONES_AND_ZEROES.visualize("TEST here!".getBytes()));
-        System.out.println(SQUARES.visualize("TEST here!".getBytes()));
+        byte[] input = Hex.decode("CAFE BABE 0001 0203 9933 FF");
+
+        for (ByteVisualization visualization : ByteVisualization.values()) {
+            System.out.println(visualization.visualize(input));
+        }
     }
 }

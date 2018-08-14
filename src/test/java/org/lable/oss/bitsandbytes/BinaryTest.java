@@ -84,6 +84,12 @@ public class BinaryTest {
         assertThat(encode(new byte[]{64, 0}, true, true), is("[01000000] [00000000]"));
         assertThat(encode(new byte[]{64, 0}, false, false), is("0100000000000000"));
         assertThat(encode(new byte[]{64, 0}, true, false), is("[01000000][00000000]"));
+
+        assertThat(encode(new byte[] {-1, -86, 15, 0}, false, true), is("11111111 10101010 00001111 00000000"));
+        assertThat(
+                encode(new byte[] {(byte) 0b11111111, (byte) 0b10101010, 0b00001111, 0b00000000}, false, true),
+                is("11111111 10101010 00001111 00000000")
+        );
     }
 
     @Test
