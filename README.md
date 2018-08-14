@@ -4,6 +4,11 @@ Bits and Bytes
 A modest collection of utility classes that make some bit and byte-wise
 operations in Java a little bit more readable.
 
+**This Java 7 branch is no longer supported.**
+
+If you really need this library on Java 7 instead of Java 8 or newer, feel free to use this branch,
+but keep in mind that bugs fixed on `master` may still be present here. Patches welcome of course.
+
 ## Purpose
 
 This tiny library can be used in projects where bit and byte manipulation is
