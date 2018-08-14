@@ -1,5 +1,4 @@
-Bits and Bytes
-==============
+# Bits and Bytes
 
 A modest collection of utility classes that make some bit and byte-wise
 operations in Java a little bit more readable.
@@ -22,7 +21,7 @@ This library is available on Maven Central. The newest versions use the Java 8 A
 <dependency>
     <groupId>org.lable.oss.bitsandbytes</groupId>
     <artifactId>bitsandbytes</artifactId>
-    <version>3.4</version>
+    <version>3.6</version>
 </dependency>
 ```
 
@@ -40,7 +39,8 @@ If you need a Java 7 version of this library, use the `2.*` versions:
 
 ### Binary
 
-In unit tests and debugging output the `Binary` class can aid in making bit-wise operations more readable.
+In unit tests and debugging output the `Binary` class can aid in making the result of bit-wise operations more 
+readable in your tests.
 
 For example:
 
@@ -48,6 +48,10 @@ For example:
 // Instead of:
 assertThat(someBitManipulatingMethodUnderTest(0),
            is(new byte[] {-1, -86, 15, 0})));
+
+// Or in the bit-notation with the required casting to byte for values over 127:
+assertThat(someBitManipulatingMethodUnderTest(0),
+           is(new byte[] {(byte) 0b11111111, (byte) 0b10101010, 0b00001111, 0b00000000})));
 
 // Write:
 assertThat(someBitManipulatingMethodUnderTest(0),
@@ -77,6 +81,24 @@ Turn hexadecimal string representations into byte arrays, and vice versa.
 
 ```java
 byte[] java = Hex.decode("0xCAFEBABE");
+
+byte[] macAddress = Hex.decode("00:e1:8c:fc:05:5f");
+```
+
+### Various byte visualization methods
+
+In addition to `Binary` and `Hex`, the 
+[`ByteVisualization`](src/main/java/org/lable/oss/bitsandbytes/ByteVisualization.java) enumerator class can be used to 
+format byte values and byte arrays in a variety of colourful string representations:
+
+```java
+byte[] input = Hex.decode("CAFE BABE 0001 0203 9933 FF");
+
+// ⣊⣾⢺⢾⠀⠁⠂⠃⢙⠳⣿
+String braille = ByteVisualization.BRAILLE.visualize(input);
+
+// ▄▐█▟▜▐▜▟   ▘ ▝ ▀▚▚▀▀██
+String squares = ByteVisualization.SQUARES.visualize(input);
 ```
 
 ### ByteMangler
@@ -91,20 +113,20 @@ byte[] cat = ByteMangler.add(part, anotherPart, andAnotherPart, yetAnotherPart);
 // Shrink a byte[], discarding the rest. Output here is the same as "1234".getBytes().
 byte[] fourBytes = ByteMangler.shrink("12345".getBytes(), 4);
 
-// Remove a number of bytes from the start of a byte[]. Output here is the same as "2345".getBytes().
-byte[] againFourBytes = ByteMangler.chomp("12345".getBytes(), 1);
+// Remove a number of bytes from the start of a byte[]. Output here is the same as "345".getBytes().
+byte[] threeBytes = ByteMangler.chomp("12345".getBytes(), 2);
 
 // Flip all bits in a byte[].
 byte[] normal = Binary.decode("11001111 00000001");
 // Equal to Binary.decode("00110000 11111110").
-byte[] flipped = ByteMangler.flip(unflipped);
+byte[] flipped = ByteMangler.flip(normal);
 
 // Reverse the order of bits in a byte[].
 // Equal to Binary.decode("10000000 11110011").
 byte[] reversed = ByteMangler.reverse(normal);
 ```
 
-Analogous to String's `split` method, `ByteMangler` provides a `split` method as well:
+Analogous to `String`'s `split` method, `ByteMangler` provides a `split` method as well:
 
 ```java
 // Split a byte[] on 0x00 bytes:
