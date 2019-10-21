@@ -17,6 +17,9 @@ package org.lable.oss.bitsandbytes;
 
 import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.nullValue;
@@ -231,6 +234,17 @@ public class ByteManglerTest {
         assertThat(
                 add("XXX".getBytes(), "YYY".getBytes(), "ZZZ".getBytes(), "əəə".getBytes()),
                 is("XXXYYYZZZəəə".getBytes()));
+        assertThat(add((byte[]) null), is(new byte[0]));
+    }
+
+    @Test
+    public void addCollectionTest() {
+        assertThat(
+                add(Arrays.asList("XXX".getBytes(), "YYY".getBytes(), "ZZZ".getBytes(), "əəə".getBytes())),
+                is("XXXYYYZZZəəə".getBytes()));
+
+        assertThat(add(Collections.emptyList()), is(new byte[0]));
+        assertThat(add((Collection<byte[]>) null), is(new byte[0]));
     }
 
 
