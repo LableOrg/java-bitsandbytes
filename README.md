@@ -15,15 +15,17 @@ Hadoop's MapReduce tasks.
 
 ## Installation
 
-This library is available on Maven Central. The newest versions use the Java 8 API:
+This library is available on Maven Central. The newest versions use the Java 11 API:
 
 ```
 <dependency>
     <groupId>org.lable.oss.bitsandbytes</groupId>
     <artifactId>bitsandbytes</artifactId>
-    <version>3.6</version>
+    <version>4.0</version>
 </dependency>
 ```
+
+For Java 8, please use the latest `3.*` version.
 
 ## Example usage
 
