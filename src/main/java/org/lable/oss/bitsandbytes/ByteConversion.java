@@ -18,7 +18,7 @@ package org.lable.oss.bitsandbytes;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.time.*;
 import java.time.format.DateTimeParseException;
 
@@ -44,7 +44,7 @@ public class ByteConversion {
      */
     public static byte[] fromString(String input) {
         if (input == null) return null;
-        return input.getBytes(Charset.forName("UTF-8"));
+        return input.getBytes(StandardCharsets.UTF_8);
     }
 
     /**
@@ -55,7 +55,7 @@ public class ByteConversion {
      */
     public static String toString(byte[] bytes) {
         if (bytes == null) return null;
-        return new String(bytes, Charset.forName("UTF-8"));
+        return new String(bytes, StandardCharsets.UTF_8);
     }
 
 
@@ -91,9 +91,8 @@ public class ByteConversion {
      * @param input                Input value.
      * @param numberRepresentation How to represent the number in bytes.
      * @return Bytes.
-     * @throws ConversionException Thrown when the input is null.
      */
-    public static byte[] fromInt(int input, NumberRepresentation numberRepresentation) throws ConversionException {
+    public static byte[] fromInt(int input, NumberRepresentation numberRepresentation) {
         return numberRepresentation == NumberRepresentation.LEXICOGRAPHIC_SORT
                 ? flipTheFirstBit(fromInt(input))
                 : fromInt(input);
@@ -105,7 +104,7 @@ public class ByteConversion {
      * @param input Input value.
      * @return Bytes.
      */
-    public static byte[] fromInt(int input) throws ConversionException {
+    public static byte[] fromInt(int input) {
         return ByteBuffer.allocate(4).putInt(input).array();
     }
 
@@ -153,7 +152,7 @@ public class ByteConversion {
      * @param input Input value.
      * @return Bytes.
      */
-    public static byte[] fromFloat(float input) throws ConversionException {
+    public static byte[] fromFloat(float input) {
         return ByteBuffer.allocate(4).putFloat(input).array();
     }
 
@@ -188,7 +187,7 @@ public class ByteConversion {
      * @param input Input value.
      * @return Bytes.
      */
-    public static byte[] fromDouble(double input) throws ConversionException {
+    public static byte[] fromDouble(double input) {
         return ByteBuffer.allocate(8).putDouble(input).array();
     }
 
@@ -237,9 +236,8 @@ public class ByteConversion {
      * @param input                Input value.
      * @param numberRepresentation How to represent the number in bytes.
      * @return Bytes.
-     * @throws ConversionException Thrown when the input is null.
      */
-    public static byte[] fromLong(long input, NumberRepresentation numberRepresentation) throws ConversionException {
+    public static byte[] fromLong(long input, NumberRepresentation numberRepresentation) {
         return numberRepresentation == NumberRepresentation.LEXICOGRAPHIC_SORT
                 ? flipTheFirstBit(fromLong(input))
                 : fromLong(input);
