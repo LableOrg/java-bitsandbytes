@@ -16,7 +16,7 @@
 package org.lable.oss.bitsandbytes;
 
 import java.io.ByteArrayOutputStream;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Static utility methods for reading string representations of byte sequences.
@@ -60,7 +60,7 @@ public class ByteReader {
                     continue;
                 }
             }
-            byte[] utf8 = Character.toString(c).getBytes(Charset.forName("UTF-8"));
+            byte[] utf8 = Character.toString(c).getBytes(StandardCharsets.UTF_8);
             for (byte b : utf8) {
                 baos.write(b);
             }
