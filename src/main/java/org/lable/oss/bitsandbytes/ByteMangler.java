@@ -192,7 +192,7 @@ public class ByteMangler {
             length += bytes.length;
         }
 
-        byte [] result = new byte[length];
+        byte[] result = new byte[length];
 
         int pos = 0;
         for (byte[] bytes : input) {
@@ -202,6 +202,130 @@ public class ByteMangler {
         }
 
         return result;
+    }
+
+    /**
+     * Convenience method for {@link #add(byte[]...)}. All Strings will be converted to bytes assuming UTF-8 as the
+     * desired encoding.
+     *
+     * @param one First string.
+     * @param rest Following strings.
+     * @return A single concatenated byte array.
+     */
+    public static byte[] add(String one, String... rest) {
+        if (rest == null || rest.length == 0) {
+            return ByteConversion.fromString(one);
+        }
+
+        byte[][] input = new byte[rest.length + 1][];
+        input[0] = ByteConversion.fromString(one);
+        for (int i = 0; i < rest.length; i++) {
+            input[i + 1] = ByteConversion.fromString(rest[i]);
+        }
+
+        return add(input);
+    }
+
+    /**
+     * Convenience method for {@link #add(byte[]...)}. All Strings will be converted to bytes assuming UTF-8 as the
+     * desired encoding.
+     *
+     * @param one First part.
+     * @param two Second part.
+     * @return A single concatenated byte array.
+     */
+    public static byte[] add(String one, byte[] two) {
+        return add(ByteConversion.fromString(one), two);
+    }
+
+    /**
+     * Convenience method for {@link #add(byte[]...)}. All Strings will be converted to bytes assuming UTF-8 as the
+     * desired encoding.
+     *
+     * @param one First part.
+     * @param two Second part.
+     * @return A single concatenated byte array.
+     */
+    public static byte[] add(byte[] one, String two) {
+        return add(one, ByteConversion.fromString(two));
+    }
+
+    /**
+     * Convenience method for {@link #add(byte[]...)}. All Strings will be converted to bytes assuming UTF-8 as the
+     * desired encoding.
+     *
+     * @param one First part.
+     * @param two Second part.
+     * @param three Third part.
+     * @return A single concatenated byte array.
+     */
+    public static byte[] add(String one, byte[] two, byte[] three) {
+        return add(ByteConversion.fromString(one), two, three);
+    }
+
+    /**
+     * Convenience method for {@link #add(byte[]...)}. All Strings will be converted to bytes assuming UTF-8 as the
+     * desired encoding.
+     *
+     * @param one First part.
+     * @param two Second part.
+     * @param three Third part.
+     * @return A single concatenated byte array.
+     */
+    public static byte[] add(byte[] one, String two, byte[] three) {
+        return add(one, ByteConversion.fromString(two), three);
+    }
+
+    /**
+     * Convenience method for {@link #add(byte[]...)}. All Strings will be converted to bytes assuming UTF-8 as the
+     * desired encoding.
+     *
+     * @param one First part.
+     * @param two Second part.
+     * @param three Third part.
+     * @return A single concatenated byte array.
+     */
+    public static byte[] add(byte[] one, byte[] two, String three) {
+        return add(one, two, ByteConversion.fromString(three));
+    }
+
+    /**
+     * Convenience method for {@link #add(byte[]...)}. All Strings will be converted to bytes assuming UTF-8 as the
+     * desired encoding.
+     *
+     * @param one First part.
+     * @param two Second part.
+     * @param three Third part.
+     * @return A single concatenated byte array.
+     */
+    public static byte[] add(byte[] one, String two, String three) {
+        return add(one, ByteConversion.fromString(two), ByteConversion.fromString(three));
+    }
+
+    /**
+     * Convenience method for {@link #add(byte[]...)}. All Strings will be converted to bytes assuming UTF-8 as the
+     * desired encoding.
+     *
+     * @param one First part.
+     * @param two Second part.
+     * @param three Third part.
+     * @return A single concatenated byte array.
+     */
+    public static byte[] add(String one, byte[] two, String three) {
+        return add(ByteConversion.fromString(one), two, ByteConversion.fromString(three));
+    }
+
+    /**
+     * Convenience method for {@link #add(byte[]...)}. All Strings will be converted to bytes assuming UTF-8 as the
+     * desired encoding.
+     *
+     * @param one First part.
+     * @param two Second part.
+     * @param three Third part.
+     * @return A single concatenated byte array.
+     */
+    public static byte[] add(String one, String two, byte[] three) {
+        return add(ByteConversion.fromString(one), ByteConversion.fromString(two), three);
     }
 
     /**
@@ -219,7 +343,7 @@ public class ByteMangler {
             length += bytes.length;
         }
 
-        byte [] result = new byte[length];
+        byte[] result = new byte[length];
 
         int pos = 0;
         for (byte[] bytes : input) {
@@ -230,7 +354,6 @@ public class ByteMangler {
 
         return result;
     }
-
 
     /**
      * Split a byte array into parts, splitting at each occurrence of the delimiter. The returned parts do not contain
@@ -371,6 +494,21 @@ public class ByteMangler {
             current += replacement.length;
         }
 
+        return output;
+    }
+
+    /**
+     * Return a new byte array filled in all positions with the specified byte.
+     *
+     * @param input Byte to repeat.
+     * @param times Length of the array.
+     * @return A new byte array.
+     * @throws IllegalArgumentException Thrown if times is less than 0.
+     */
+    public static byte[] repeat(byte input, int times) {
+        if (times < 0) throw new IllegalArgumentException("Times must be positive.");
+        byte[] output = new byte[times];
+        Arrays.fill(output, input);
         return output;
     }
 }

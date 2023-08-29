@@ -17,6 +17,7 @@ package org.lable.oss.bitsandbytes;
 
 import org.junit.Test;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -226,13 +227,13 @@ public class ByteManglerTest {
 
     @Test
     public void addNullArgumentTest() {
-        assertThat(add("XXX".getBytes(), null, "YYY".getBytes()), is("XXXYYY".getBytes()));
+        assertThat(add("XXX".getBytes(), (byte[]) null, "YYY".getBytes()), is("XXXYYY".getBytes()));
     }
 
     @Test
     public void addTest() {
         assertThat(
-                add("XXX".getBytes(), "YYY".getBytes(), "ZZZ".getBytes(), "əəə".getBytes()),
+                add("XXX".getBytes(), "YYY".getBytes(), "ZZZ".getBytes(), "əəə".getBytes(StandardCharsets.UTF_8)),
                 is("XXXYYYZZZəəə".getBytes()));
         assertThat(add((byte[]) null), is(new byte[0]));
     }
@@ -240,11 +241,31 @@ public class ByteManglerTest {
     @Test
     public void addCollectionTest() {
         assertThat(
-                add(Arrays.asList("XXX".getBytes(), "YYY".getBytes(), "ZZZ".getBytes(), "əəə".getBytes())),
+                add(Arrays.asList("XXX".getBytes(), "YYY".getBytes(), "ZZZ".getBytes(), "əəə".getBytes(StandardCharsets.UTF_8))),
                 is("XXXYYYZZZəəə".getBytes()));
 
         assertThat(add(Collections.emptyList()), is(new byte[0]));
         assertThat(add((Collection<byte[]>) null), is(new byte[0]));
+    }
+
+    @Test
+    public void addStringConvenienceTest() {
+        assertThat(add("XXX", "YYY", "ZZZ", "əəə"), is("XXXYYYZZZəəə".getBytes()));
+
+        assertThat(add("ə", "€"), is("ə€".getBytes(StandardCharsets.UTF_8)));
+        assertThat(add("ə".getBytes(StandardCharsets.UTF_8), "€"), is("ə€".getBytes(StandardCharsets.UTF_8)));
+        assertThat(add("ə", "€".getBytes(StandardCharsets.UTF_8)), is("ə€".getBytes(StandardCharsets.UTF_8)));
+
+        assertThat(add((String) null, "€".getBytes(StandardCharsets.UTF_8)), is("€".getBytes(StandardCharsets.UTF_8)));
+        assertThat(add("€".getBytes(StandardCharsets.UTF_8), (String) null), is("€".getBytes(StandardCharsets.UTF_8)));
+
+        assertThat(add("XXX", "YYY", "əəə".getBytes(StandardCharsets.UTF_8)), is("XXXYYYəəə".getBytes(StandardCharsets.UTF_8)));
+        assertThat(add("XXX".getBytes(StandardCharsets.UTF_8), "YYY", "əəə"), is("XXXYYYəəə".getBytes(StandardCharsets.UTF_8)));
+        assertThat(add("XXX", "YYY".getBytes(StandardCharsets.UTF_8), "əəə"), is("XXXYYYəəə".getBytes(StandardCharsets.UTF_8)));
+
+        assertThat(add("XXX".getBytes(StandardCharsets.UTF_8), "YYY", "əəə".getBytes(StandardCharsets.UTF_8)), is("XXXYYYəəə".getBytes(StandardCharsets.UTF_8)));
+        assertThat(add("XXX", "YYY".getBytes(StandardCharsets.UTF_8), "əəə".getBytes(StandardCharsets.UTF_8)), is("XXXYYYəəə".getBytes(StandardCharsets.UTF_8)));
+        assertThat(add("XXX".getBytes(StandardCharsets.UTF_8), "YYY".getBytes(StandardCharsets.UTF_8), "əəə"), is("XXXYYYəəə".getBytes(StandardCharsets.UTF_8)));
     }
 
 
@@ -544,5 +565,11 @@ public class ByteManglerTest {
     public void replaceNullInputTest() {
         assertThat(replace(null, "XXX".getBytes(), "ZZZ".getBytes()), is(nullValue()));
         assertThat(replace("XXX".getBytes(), null, "ZZZ".getBytes()), is("XXX".getBytes()));
+    }
+
+    @Test
+    public void repeatTest() {
+        assertThat(Hex.encode(repeat(CommonByteValues.B_NULL, 8)), is("0000000000000000"));
+        assertThat(Hex.encode(repeat(CommonByteValues.B_FULL, 8)), is("FFFFFFFFFFFFFFFF"));
     }
 }
