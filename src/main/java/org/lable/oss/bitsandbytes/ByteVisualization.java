@@ -43,6 +43,17 @@ public enum ByteVisualization {
                     .forEach(baos::write);
             return baos.toByteArray();
         }
+
+        @Override
+        public byte parseByte(String input) {
+            if (input == null) return 0;
+            for (char c : input.toCharArray()) {
+                if (c >= '\u2800' && c <= '\u28FF') {
+                    return (byte) (c - '\u2800');
+                }
+            }
+            return 0;
+        }
     },
     /**
      * Represent a byte as a string of ones and zeroes, e.g., {@code 11000000} for {@code 192}.
@@ -83,7 +94,7 @@ public enum ByteVisualization {
             int byteCounter = 0;
             for (char bit : chars) {
                 if (bit == '1') {
-                    output[byteCounter] |= 1 << (7 - bitCounter);
+                    output[byteCounter] |= (byte) (1 << (7 - bitCounter));
                 }
 
                 bitCounter++;
@@ -93,6 +104,23 @@ public enum ByteVisualization {
                 }
             }
             return output;
+        }
+
+        @Override
+        public byte parseByte(String input) {
+            byte out = 0;
+            int bitCounter = 7;
+            char[] in = input.toCharArray();
+            for (int i = in.length - 1; i >= 0; i--) {
+                char bit = in[i];
+                if (bit == '1') {
+                    out |= (byte) (1 << (7 - bitCounter));
+                    bitCounter--;
+                } else if (bit == '0') {
+                    bitCounter--;
+                }
+            }
+            return out;
         }
     },
     /**
@@ -120,7 +148,7 @@ public enum ByteVisualization {
 
             StringBuilder cleanInput = new StringBuilder();
             for (char c : input.toCharArray()) {
-                // Strip out anything that isn't a 1 or 0.
+                // Strip out anything that isn't one of the sixteen hex chars.
                 if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f')) {
                     cleanInput.append(c);
                 } else if (c >= 'A' && c <= 'F') {
@@ -147,6 +175,48 @@ public enum ByteVisualization {
             }
 
             return output;
+        }
+
+        @Override
+        public byte parseByte(String input) {
+            input = input.trim();
+
+            if (input.startsWith("0x") || input.startsWith("0X")) {
+                input = input.substring(2);
+            }
+
+            boolean doHigh = true;
+            boolean setLow = false;
+            int high = 0;
+            int low = 0;
+            for (char c : input.toCharArray()) {
+                // Ignore anything that isn't one of the sixteen hex chars.
+                if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f')) {
+                    if (doHigh) {
+                        high = value(c);
+                        doHigh = false;
+                    } else {
+                        low = value(c);
+                        setLow = true;
+                    }
+                } else if (c >= 'A' && c <= 'F') {
+                    // Turn uppercase A–F into lowercase a–f.
+                    c = (char) (c + 0x20);
+                    if (doHigh) {
+                        high = value(c);
+                        doHigh = false;
+                    } else {
+                        low = value(c);
+                        setLow = true;
+                    }
+                }
+            }
+
+            // If only one character was parsed, treat it as the lower four bits.
+            // This makes '0x0F', '0F', and  'F', all equal.
+            return setLow
+                    ? (byte) (high << 4 ^ low)
+                    : (byte) high;
         }
 
         private int value(char c) {
@@ -195,6 +265,24 @@ public enum ByteVisualization {
             return baos.toByteArray();
         }
 
+        @Override
+        public byte parseByte(String input) {
+            Integer firstOfPair = null;
+            for (char c : input.toCharArray()) {
+                int value = isValid(c);
+                // Skip all unparsable characters.
+                if (value >= 0) {
+                    if (firstOfPair == null) {
+                        firstOfPair = value;
+                    } else {
+                        return (byte) (firstOfPair << 4 | value);
+                    }
+                }
+            }
+
+            return 0;
+        }
+
         int isValid(char c) {
             if (c == ' ') return 0;
             if (c >= '\u2580' && c <= '\u259F') return VALUES[c - '\u2580'];
@@ -217,6 +305,14 @@ public enum ByteVisualization {
      * @return A byte array.
      */
     public abstract byte[] parse(String input);
+
+    /**
+     * Turn a visualization of a byte into the byte it represents.
+     *
+     * @param input A string visualization.
+     * @return A byte.
+     */
+    public abstract byte parseByte(String input);
 
     /**
      * Visualize a byte array with a printable string.

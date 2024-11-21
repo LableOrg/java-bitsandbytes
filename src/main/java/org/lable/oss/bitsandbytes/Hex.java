@@ -45,6 +45,26 @@ public class Hex {
     }
 
     /**
+     * Convert a hexadecimal string representation of a byte to that byte. This method purposely ignores any
+     * characters that are not part of {@code 0-9A-Fa-f}, so you can use spaces and any other punctuation deemed
+     * suitable to improve readability.
+     * <p>
+     * The following input strings all return the same byte:
+     * <ul>
+     * <li>"FF"</li>
+     * <li>"ff"</li>
+     * <li>"[FF]"</li>
+     * <li>"0xFF"</li>
+     * </ul>
+     *
+     * @param hexadecimal Input string.
+     * @return The corresponding byte.
+     */
+    public static byte decodeByte(String hexadecimal) {
+        return ByteVisualization.HEXADECIMAL.parseByte(hexadecimal);
+    }
+
+    /**
      * Encode a byte array as its hexadecimal string representation.
      *
      * @param input Input byte array.

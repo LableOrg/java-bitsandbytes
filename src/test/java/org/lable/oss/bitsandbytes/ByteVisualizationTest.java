@@ -60,6 +60,14 @@ public class ByteVisualizationTest {
     }
 
     @Test
+    public void brailleParseByteTest() {
+        assertThat(BRAILLE.parseByte("\u2800"), is((byte) 0));
+        assertThat(BRAILLE.parseByte("\u2840"), is((byte) 64));
+        assertThat(BRAILLE.parseByte(""), is((byte) 0));
+        assertThat(BRAILLE.parseByte(null), is((byte) 0));
+    }
+
+    @Test
     public void onesAndZeroesVisualizeTest() {
         // Limited. See BinaryTest for the full suite.
         assertThat(ONES_AND_ZEROES.visualize(new byte[]{0}), is("00000000"));
@@ -72,6 +80,14 @@ public class ByteVisualizationTest {
     }
 
     @Test
+    public void onesAndZeroesParseByteTest() {
+        assertThat(ONES_AND_ZEROES.parseByte("11110000"), is((byte) -16));
+        assertThat(ONES_AND_ZEROES.parseByte("00000001"), is((byte) 1));
+        assertThat(ONES_AND_ZEROES.parseByte(" [00000001] "), is((byte) 1));
+        assertThat(ONES_AND_ZEROES.parseByte("01"), is((byte) 1));
+    }
+
+    @Test
     public void hexadecimalVisualizeTest() {
         // Limited. See BinaryTest for the full suite.
         assertThat(HEXADECIMAL.visualize(new byte[]{0}), is("00"));
@@ -81,6 +97,39 @@ public class ByteVisualizationTest {
     public void hexadecimalParseTest() {
         // Limited. See BinaryTest for the full suite.
         assertThat(HEXADECIMAL.parse("F0"), is(new byte[]{-16}));
+    }
+
+    @Test
+    public void hexadecimalByteParseTest() {
+        assertThat(HEXADECIMAL.parseByte("0"), is((byte) 0));
+        assertThat(HEXADECIMAL.parseByte("00"), is((byte) 0));
+        assertThat(HEXADECIMAL.parseByte("0x00"), is((byte) 0));
+
+        assertThat(HEXADECIMAL.parseByte("F0"), is((byte) -16));
+        assertThat(HEXADECIMAL.parseByte("0F"), is((byte) 15));
+        assertThat(HEXADECIMAL.parseByte("F"), is((byte) 15));
+
+        assertThat(HEXADECIMAL.parseByte("0"), is((byte) 0));
+        assertThat(HEXADECIMAL.parseByte("1"), is((byte) 1));
+        assertThat(HEXADECIMAL.parseByte("2"), is((byte) 2));
+        assertThat(HEXADECIMAL.parseByte("3"), is((byte) 3));
+        assertThat(HEXADECIMAL.parseByte("4"), is((byte) 4));
+        assertThat(HEXADECIMAL.parseByte("5"), is((byte) 5));
+        assertThat(HEXADECIMAL.parseByte("6"), is((byte) 6));
+        assertThat(HEXADECIMAL.parseByte("7"), is((byte) 7));
+        assertThat(HEXADECIMAL.parseByte("8"), is((byte) 8));
+        assertThat(HEXADECIMAL.parseByte("9"), is((byte) 9));
+        assertThat(HEXADECIMAL.parseByte("A"), is((byte) 10));
+        assertThat(HEXADECIMAL.parseByte("B"), is((byte) 11));
+        assertThat(HEXADECIMAL.parseByte("C"), is((byte) 12));
+        assertThat(HEXADECIMAL.parseByte("D"), is((byte) 13));
+        assertThat(HEXADECIMAL.parseByte("E"), is((byte) 14));
+        assertThat(HEXADECIMAL.parseByte("F"), is((byte) 15));
+
+        assertThat(HEXADECIMAL.parseByte("10"), is((byte) 16));
+        assertThat(HEXADECIMAL.parseByte("FF"), is((byte) 255));
+        assertThat(HEXADECIMAL.parseByte("fF"), is((byte) 255));
+        assertThat(HEXADECIMAL.parseByte("-FF-"), is((byte) 255));
     }
 
     @Test
@@ -118,6 +167,14 @@ public class ByteVisualizationTest {
         assertThat(SQUARES.parse("bogus"), is(new byte[0]));
         assertThat(SQUARES.parse(""), is(new byte[0]));
         assertThat(SQUARES.parse(null), is(new byte[0]));
+    }
+
+    @Test
+    public void squaresParseByteTest() {
+        assertThat(SQUARES.parseByte(" "), is((byte) 0));
+        assertThat(SQUARES.parseByte("\u2597 "), is((byte) 128));
+        assertThat(SQUARES.parseByte(" \u2597"), is((byte) 8));
+        assertThat(SQUARES.parseByte("\u259b\u2588"), is((byte) 127));
     }
 
     @Test
