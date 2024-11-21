@@ -223,6 +223,27 @@ public enum ByteVisualization {
             return c >= '0' && c <= '9' ? c - 0x30 : c - 0x57;
         }
     },
+    HEXADECIMAL_LOWER {
+        @Override
+        public String visualize(byte input) {
+            int high = input >> 4 & 0x0F;
+            int low = input & 0x0F;
+            return new String(new char[]{
+                    (high > 9 ? (char) (high + 0x57) : (char) (high + 0x30)),
+                    (low > 9 ? (char) (low + 0x57) : (char) (low + 0x30))
+            });
+        }
+
+        @Override
+        public byte[] parse(String input) {
+            return HEXADECIMAL.parse(input);
+        }
+
+        @Override
+        public byte parseByte(String input) {
+            return HEXADECIMAL.parseByte(input);
+        }
+    },
     /**
      * Use Unicode Block Elements to represent each byte using two glyphs.
      */

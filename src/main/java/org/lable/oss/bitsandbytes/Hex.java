@@ -45,9 +45,9 @@ public class Hex {
     }
 
     /**
-     * Convert a hexadecimal string representation of a byte to that byte. This method purposely ignores any
-     * characters that are not part of {@code 0-9A-Fa-f}, so you can use spaces and any other punctuation deemed
-     * suitable to improve readability.
+     * Convert a hexadecimal string representation of a byte to that byte. This method purposely ignores any characters
+     * that are not part of {@code 0-9A-Fa-f}, so you can use spaces and any other punctuation deemed suitable to
+     * improve readability.
      * <p>
      * The following input strings all return the same byte:
      * <ul>
@@ -72,5 +72,41 @@ public class Hex {
      */
     public static String encode(byte[] input) {
         return ByteVisualization.HEXADECIMAL.visualize(input);
+    }
+
+    /**
+     * Encode a byte array as its hexadecimal string representation.
+     *
+     * @param input     Input byte array.
+     * @param lowerCase Whether to use lowercase for the letters a through f, or not (i.e., use uppercase).
+     * @return A hexadecimal string, or "NULL" if the input is null.
+     */
+    public static String encode(byte[] input, boolean lowerCase) {
+        return lowerCase
+                ? ByteVisualization.HEXADECIMAL_LOWER.visualize(input)
+                : ByteVisualization.HEXADECIMAL.visualize(input);
+    }
+
+    /**
+     * Encode a byte as its hexadecimal string representation.
+     *
+     * @param input Input byte.
+     * @return A hexadecimal string, or "NULL" if the input is null.
+     */
+    public static String encode(byte input) {
+        return ByteVisualization.HEXADECIMAL.visualize(input);
+    }
+
+    /**
+     * Encode a byte as its hexadecimal string representation.
+     *
+     * @param input     Input byte.
+     * @param lowerCase Whether to use lowercase for the letters a through f, or not (i.e., use uppercase).
+     * @return A hexadecimal string, or "NULL" if the input is null.
+     */
+    public static String encode(byte input, boolean lowerCase) {
+        return lowerCase
+                ? ByteVisualization.HEXADECIMAL_LOWER.visualize(input)
+                : ByteVisualization.HEXADECIMAL.visualize(input);
     }
 }

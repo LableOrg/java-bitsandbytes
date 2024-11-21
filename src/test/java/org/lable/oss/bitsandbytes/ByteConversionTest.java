@@ -351,6 +351,25 @@ public class ByteConversionTest {
         toLocalDate("1999-13-50".getBytes());
     }
 
+    @Test
+    public void fromIPAddressTest() throws ConversionException {
+        assertThat(fromIPAddress(IPAddress.parse("10.0.0.1")), is(Hex.decode("0A000001")));
+        assertThat(fromIPAddress(IPAddress4.parse("10.0.0.1")), is(Hex.decode("0A000001")));
+
+        assertThat(fromIPAddress(IPAddress.parse("::")), is(Hex.decode("00000000000000000000000000000000")));
+        assertThat(fromIPAddress(IPAddress6.parse("::")), is(Hex.decode("00000000000000000000000000000000")));
+
+        assertThat(fromIPAddress(IPAddress6.parse("fe80::b336:6660:c18a:6903")), is(Hex.decode("fe80:0000:0000:0000:b336:6660:c18a:6903")));
+    }
+
+    @Test
+    public void toIPAddressTest() throws ConversionException {
+        assertThat(toIPAddress(Hex.decode("fe80:0000:0000:0000:b336:6660:c18a:6903")), is(IPAddress6.parse("fe80::b336:6660:c18a:6903")));
+        assertThat(toIPAddress6(Hex.decode("0000:0000:0000:0000:0000:0000:0000:0001")), is(IPAddress6.parse("::1")));
+
+        assertThat(toIPAddress(Hex.decode("7F.00.00.01")), is(IPAddress4.parse("127.0.0.1")));
+        assertThat(toIPAddress4(Hex.decode("7F.00.00.01")), is(IPAddress4.parse("127.0.0.1")));
+    }
 
     @Test
     public void numberRepresentationTest() {

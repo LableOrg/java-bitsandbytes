@@ -25,8 +25,8 @@ import java.time.format.DateTimeParseException;
 import static org.lable.oss.bitsandbytes.ByteMangler.*;
 
 /**
- * Convert Java primitives to and from byte arrays for storage. These methods are useful when such operations happen
- * a lot in your code. Most of them are little more than wrappers around {@link ByteBuffer}.
+ * Convert Java primitives to and from byte arrays for storage. These methods are useful when such operations happen a
+ * lot in your code. Most of them are little more than wrappers around {@link ByteBuffer}.
  * <p>
  * For all operations the Big-Endian byte order is maintained. For strings the desired encoding is assumed to be UTF-8.
  */
@@ -374,8 +374,8 @@ public class ByteConversion {
     /**
      * Convert an {@link OffsetDateTime} to bytes.
      * <p>
-     * The first eight bytes represent the seconds since the epoch, the next four bytes are the nanosecond
-     * adjustment. The remaining bytes are a string representing the time-zone offset ({@link ZoneOffset}).
+     * The first eight bytes represent the seconds since the epoch, the next four bytes are the nanosecond adjustment.
+     * The remaining bytes are a string representing the time-zone offset ({@link ZoneOffset}).
      *
      * @param input Input value.
      * @return Bytes.
@@ -391,8 +391,8 @@ public class ByteConversion {
     /**
      * Convert a byte array to an {@link OffsetDateTime}.
      * <p>
-     * The first eight bytes represent the seconds since the epoch, the next four bytes are the nanosecond
-     * adjustment. The remaining bytes are a string representing the time-zone offset ({@link ZoneOffset}).
+     * The first eight bytes represent the seconds since the epoch, the next four bytes are the nanosecond adjustment.
+     * The remaining bytes are a string representing the time-zone offset ({@link ZoneOffset}).
      *
      * @param bytes Byte array.
      * @return An {@link OffsetDateTime}.
@@ -420,8 +420,8 @@ public class ByteConversion {
     /**
      * Convert a {@link ZonedDateTime} to bytes.
      * <p>
-     * The first eight bytes represent the seconds since the epoch, the next four bytes are the nanosecond
-     * adjustment. The remaining bytes are a string representing the time-zone identifier ({@link ZoneId}).
+     * The first eight bytes represent the seconds since the epoch, the next four bytes are the nanosecond adjustment.
+     * The remaining bytes are a string representing the time-zone identifier ({@link ZoneId}).
      *
      * @param input Input value.
      * @return Bytes.
@@ -437,8 +437,8 @@ public class ByteConversion {
     /**
      * Convert a byte array to a {@link ZonedDateTime}.
      * <p>
-     * The first eight bytes represent the seconds since the epoch, the next four bytes are the nanosecond
-     * adjustment. The remaining bytes are a string representing the time-zone identifier ({@link ZoneId}).
+     * The first eight bytes represent the seconds since the epoch, the next four bytes are the nanosecond adjustment.
+     * The remaining bytes are a string representing the time-zone identifier ({@link ZoneId}).
      *
      * @param bytes Byte array.
      * @return A {@link ZonedDateTime}.
@@ -507,8 +507,8 @@ public class ByteConversion {
      *
      * @param bytes Byte array.
      * @return A {@link LocalDate}.
-     * @throws ConversionException Thrown when the input is not 8 or 10 bytes long or is null, and when the date
-     *                             could not be parsed.
+     * @throws ConversionException Thrown when the input is not 8 or 10 bytes long or is null, and when the date could
+     *                             not be parsed.
      */
     public static LocalDate toLocalDate(byte[] bytes) throws ConversionException {
         assertNotNull(bytes);
@@ -531,6 +531,86 @@ public class ByteConversion {
         }
     }
 
+    /**
+     * Convert a byte array to an {@link IPAddress}. The input should either be 4 or 16 bytes long, for IPv4 and IPv6,
+     * respectively.
+     *
+     * @param bytes Input bytes.
+     * @return An IP-address.
+     * @throws ConversionException Thrown when the input is not 4 or 16 bytes long or is null.
+     */
+    public static IPAddress toIPAddress(byte[] bytes) throws ConversionException {
+        assertNotNull(bytes);
+        return bytes.length == 16
+                ? toIPAddress6(bytes)
+                : toIPAddress4(bytes);
+    }
+
+    /**
+     * Convert a byte array to an {@link IPAddress4}. The input should be 4 bytes long.
+     *
+     * @param bytes Input bytes.
+     * @return An IP-address.
+     * @throws ConversionException Thrown when the input is not 4 bytes long or is null.
+     */
+    public static IPAddress4 toIPAddress4(byte[] bytes) throws ConversionException {
+        int intValue = toInt(bytes);
+        return new IPAddress4(intValue);
+    }
+
+    /**
+     * Convert a byte array to an {@link IPAddress6}. The input should be 16 bytes long.
+     *
+     * @param bytes Input bytes.
+     * @return An IP-address.
+     * @throws ConversionException Thrown when the input is not 16 bytes long or is null.
+     */
+    public static IPAddress6 toIPAddress6(byte[] bytes) throws ConversionException {
+        assertNotNull(bytes);
+        assertNumBytes(bytes, 16);
+
+        ByteBuffer bb = ByteBuffer.allocate(16).put(bytes);
+        long high = bb.getLong(0);
+        long low = bb.getLong(8);
+
+        return new IPAddress6(high, low);
+    }
+
+    /**
+     * Convert an IP address into its constituent bytes.
+     *
+     * @return A byte array containing all bytes of the address.
+     */
+    public static byte[] fromIPAddress(IPAddress ipAddress) throws ConversionException {
+        assertNotNull(ipAddress);
+        if (ipAddress instanceof IPAddress6) return fromIPAddress((IPAddress6) ipAddress);
+        if (ipAddress instanceof IPAddress4) return fromIPAddress((IPAddress4) ipAddress);
+        throw new ConversionException("Unknown IPAddress class: " + ipAddress.getClass().getCanonicalName());
+    }
+
+    /**
+     * Convert an IPv6 address into its 4 constituent bytes.
+     *
+     * @return A byte array containing all 4 bytes of the address.
+     */
+    public static byte[] fromIPAddress(IPAddress4 ipAddress) throws ConversionException {
+        assertNotNull(ipAddress);
+        return fromInt(ipAddress.getInt());
+    }
+
+    /**
+     * Convert an IPv6 address into its 16 constituent bytes.
+     *
+     * @return A byte array containing all 16 bytes of the address.
+     */
+    public static byte[] fromIPAddress(IPAddress6 ipAddress) throws ConversionException {
+        assertNotNull(ipAddress);
+        return ByteBuffer
+                .allocate(16)
+                .putLong(ipAddress.getHigh())
+                .putLong(ipAddress.getLow())
+                .array();
+    }
 
     /* Input validation helpers. */
 

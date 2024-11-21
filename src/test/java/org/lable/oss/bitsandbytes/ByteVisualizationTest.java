@@ -91,6 +91,9 @@ public class ByteVisualizationTest {
     public void hexadecimalVisualizeTest() {
         // Limited. See BinaryTest for the full suite.
         assertThat(HEXADECIMAL.visualize(new byte[]{0}), is("00"));
+        assertThat(HEXADECIMAL.visualize(new byte[]{-1}), is("FF"));
+        assertThat(HEXADECIMAL_LOWER.visualize(new byte[]{0}), is("00"));
+        assertThat(HEXADECIMAL_LOWER.visualize(new byte[]{-1}), is("ff"));
     }
 
     @Test
