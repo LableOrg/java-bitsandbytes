@@ -50,6 +50,8 @@ public class IPAddress6 extends IPAddress {
      */
     public static IPAddress6 parse(String address) {
         if (address == null) throw new IllegalArgumentException("Address may not be null.");
+        address = trimNonIPChars(address);
+
         int[] blocks = new int[8];
         int currentBlock = 0;
         int i;
@@ -277,5 +279,30 @@ public class IPAddress6 extends IPAddress {
             if (hex.charAt(i) != '0') return hex.substring(i);
         }
         return hex.substring(3);
+    }
+
+    static String trimNonIPChars(String ip) {
+        int start = 0;
+        int len = ip.length();
+        int end = len;
+
+        for (int i = 0; i < len; i++) {
+            if (isIPChar(ip.charAt(i))) break;
+            start++;
+        }
+
+        for (int i = len - 1; i >= start; i--) {
+            if (isIPChar(ip.charAt(i))) break;
+            end--;
+        }
+
+        return start > 0 && end < len ? ip.substring(start, end) : ip;
+    }
+
+    static boolean isIPChar(char c) {
+        return c == ':' || c == '.'
+                || (c >= '0' && c <= '9')
+                || (c >= 'a' && c <= 'z')
+                || (c >= 'A' && c <= 'Z');
     }
 }

@@ -39,7 +39,12 @@ public class IPAddress4Test {
         assertThat(IPAddress4.parse("0.0.0.1").address, is(1));
 
         assertThat(IPAddress4.parse("1.0.0.0").address, is(16777216));
+
         assertThat(IPAddress4.parse("127.0.255.250").address, is(2130771962));
+        assertThat(IPAddress4.parse(" 127.0.255.250 ").address, is(2130771962));
+        assertThat(IPAddress4.parse("[127.0.255.250]").address, is(2130771962));
+        assertThat(IPAddress4.parse(" [127.0.255.250] ").address, is(2130771962));
+
         assertThat(IPAddress4.parse("127.65530"), is(IPAddress4.parse("127.0.255.250")));
     }
 

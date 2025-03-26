@@ -54,6 +54,12 @@ public class IPAddress6Test {
         assertThat(IPAddress6.parse("::ffff:192.0.2.128").high, is(0L));
         assertThat(IPAddress6.parse("::ffff:192.0.2.128").low, is(281473902969472L));
         assertThat(IPAddress6.parse("::ffff:192.0.2.128").toString(), is("::ffff:c000:280"));
+        assertThat(IPAddress6.parse(" ::ffff:192.0.2.128 ").high, is(0L));
+        assertThat(IPAddress6.parse(" ::ffff:192.0.2.128 ").low, is(281473902969472L));
+        assertThat(IPAddress6.parse(" ::ffff:192.0.2.128 ").toString(), is("::ffff:c000:280"));
+        assertThat(IPAddress6.parse(" [::ffff:192.0.2.128] ").high, is(0L));
+        assertThat(IPAddress6.parse(" [::ffff:192.0.2.128] ").low, is(281473902969472L));
+        assertThat(IPAddress6.parse(" [::ffff:192.0.2.128] ").toString(), is("::ffff:c000:280"));
 
         // Round-trip.
         assertThat(IPAddress6.parse("fe80::b336:6660:c18a:6903").toString(), is("fe80::b336:6660:c18a:6903"));

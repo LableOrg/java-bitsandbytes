@@ -44,6 +44,8 @@ public class IPAddress4 extends IPAddress {
      */
     public static IPAddress4 parse(String address) {
         if (address == null) throw new IllegalArgumentException("Address may not be null.");
+        address = trimNonIPChars(address);
+
         String[] parts = address.split("\\.");
         if (parts.length > 4) throw new IllegalArgumentException("Unrecognized notation: " + address);
 
@@ -95,6 +97,28 @@ public class IPAddress4 extends IPAddress {
      */
     public int getInt() {
         return address;
+    }
+
+    static String trimNonIPChars(String ip) {
+        int start = 0;
+        int len = ip.length();
+        int end = len;
+
+        for (int i = 0; i < len; i++) {
+            if (isIPChar(ip.charAt(i))) break;
+            start++;
+        }
+
+        for (int i = len - 1; i >= start; i--) {
+            if (isIPChar(ip.charAt(i))) break;
+            end--;
+        }
+
+        return start > 0 && end < len ? ip.substring(start, end) : ip;
+    }
+
+    static boolean isIPChar(char c) {
+        return c == '.' || (c >= '0' && c <= '9');
     }
 
     @Override
